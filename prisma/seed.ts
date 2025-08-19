@@ -8,8 +8,23 @@ function daysAgo(days: number): Date {
   return date;
 }
 
+function addYears(date: Date, years: number): Date {
+  const newDate = new Date(date);
+  newDate.setFullYear(newDate.getFullYear() + years);
+  return newDate;
+}
+
+function addMonths(date: Date, months: number): Date {
+  const newDate = new Date(date);
+  newDate.setMonth(newDate.getMonth() + months);
+  return newDate;
+}
+
 async function main(): Promise<void> {
   // Clean existing data (in correct order to avoid foreign key conflicts)
+  await prisma.appointment.deleteMany({});
+  await prisma.scheduleExculsion.deleteMany({});
+  await prisma.schedule.deleteMany({});
   await prisma.employeeService.deleteMany({});
   await prisma.employee.deleteMany({});
   await prisma.service.deleteMany({});
@@ -86,13 +101,94 @@ async function main(): Promise<void> {
         },
       ],
     });
+
+    // Create schedules with one-year gaps
+    const currentDate = new Date();
+
+    // Alice's schedule - works most days, but not Sundays
+    await prisma.schedule.create({
+      data: {
+        employeeId: alice.id,
+        startDate: currentDate,
+        endDate: addYears(currentDate, 1),
+        // Monday to Saturday - full time
+        mondayStartsAt: '09:00',
+        mondayEndsAt: '17:00',
+        tuesdayStartsAt: '09:00',
+        tuesdayEndsAt: '17:00',
+        wednesdayStartsAt: '09:00',
+        wednesdayEndsAt: '17:00',
+        thursdayStartsAt: '09:00',
+        thursdayEndsAt: '17:00',
+        fridayStartsAt: '09:00',
+        fridayEndsAt: '17:00',
+        saturdayStartsAt: '10:00',
+        saturdayEndsAt: '16:00',
+        // Sunday - null (not working)
+        sundayStartsAt: null,
+        sundayEndsAt: null,
+      },
+    });
+
+    // Bob's schedule - works weekdays only, shorter hours
+    await prisma.schedule.create({
+      data: {
+        employeeId: bob.id,
+        startDate: currentDate,
+        endDate: addYears(currentDate, 1),
+        // Monday to Friday only
+        mondayStartsAt: '10:00',
+        mondayEndsAt: '16:00',
+        tuesdayStartsAt: '10:00',
+        tuesdayEndsAt: '16:00',
+        wednesdayStartsAt: '10:00',
+        wednesdayEndsAt: '16:00',
+        thursdayStartsAt: '10:00',
+        thursdayEndsAt: '16:00',
+        fridayStartsAt: '10:00',
+        fridayEndsAt: '16:00',
+        // Weekend - null (not working)
+        saturdayStartsAt: null,
+        saturdayEndsAt: null,
+        sundayStartsAt: null,
+        sundayEndsAt: null,
+      },
+    });
+
+    // Create schedule exclusions for unavailable months
+    await prisma.scheduleExculsion.createMany({
+      data: [
+        // Alice takes vacation in July
+        {
+          employeeId: alice.id,
+          startDate: new Date(currentDate.getFullYear(), 6, 1), // July 1st
+          endDate: new Date(currentDate.getFullYear(), 6, 31), // July 31st
+        },
+        // Bob takes vacation in December
+        {
+          employeeId: bob.id,
+          startDate: new Date(currentDate.getFullYear(), 11, 15), // December 15th
+          endDate: new Date(currentDate.getFullYear(), 11, 31), // December 31st
+        },
+        // Alice also unavailable in March for training
+        {
+          employeeId: alice.id,
+          startDate: new Date(currentDate.getFullYear(), 2, 10), // March 10th
+          endDate: new Date(currentDate.getFullYear(), 2, 20), // March 20th
+        },
+      ],
+    });
   }
 
   console.log(
-    '✅ Seeded 2 employees, 2 services, and employee-service relationships'
+    '✅ Seeded 2 employees, 2 services, employee-service relationships, schedules, and exclusions'
   );
   console.log('📋 Alice can perform: Hair Cut, Beard Trim');
   console.log('📋 Bob can perform: Hair Cut only');
+  console.log('📅 Alice works: Mon-Sat 9-5 (Sat 10-4), not Sundays');
+  console.log('📅 Bob works: Mon-Fri 10-4, not weekends');
+  console.log('🚫 Alice unavailable: July, March 10-20');
+  console.log('🚫 Bob unavailable: December 15-31');
 }
 
 main()
