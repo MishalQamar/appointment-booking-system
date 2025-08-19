@@ -14,13 +14,14 @@ datasource db {
 }
 
 model Employee {
-  id                String            @id @default(uuid()) @map("employee_id")
-  name              String            @map("employee_name")
-  profilePictureUrl String?           @map("profile_picture_url")
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
+  id                String              @id @default(uuid()) @map("employee_id")
+  name              String              @map("employee_name")
+  profilePictureUrl String?             @map("profile_picture_url")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
   employeeService   EmployeeService[]
   Schedule          Schedule[]
+  ScheduleExculsion ScheduleExculsion[]
 
   @@map("employees")
 }
@@ -48,28 +49,40 @@ model EmployeeService {
 }
 
 model Schedule {
-  id                String   @id @default(uuid()) @map("schedule_id")
-  employeeId        String   @map("employee_id")
-  employee          Employee @relation(fields: [employeeId], references: [id])
-  startDate         String?  @map("start_date")
-  endDate           String?  @map("end_date")
-  mondayStartsAt    String?  @map("monday_starts_at")
-  mondayEndsAt      String?  @map("monday_ends_at")
-  tuesdayStartsAt   String?  @map("tuesday_starts_at")
-  tuesdayEndsAt     String?  @map("tuesday_ends_at")
-  wednesdayStartsAt String?  @map("wednesday_starts_at")
-  wednesdayEndsAt   String?  @map("wednesday_ends_at")
-  thursdayStartsAt  String?  @map("thursday_starts_at")
-  thursdayEndsAt    String?  @map("thursday_ends_at")
-  fridayStartsAt    String?  @map("friday_starts_at")
-  fridayEndsAt      String?  @map("friday_ends_at")
-  saturdayStartsAt  String?  @map("saturday_starts_at")
-  saturdayEndsAt    String?  @map("saturday_ends_at")
-  sundayStartsAt    String?  @map("sunday_starts_at")
-  sundayEndsAt      String?  @map("sunday_ends_at")
+  id                String    @id @default(uuid()) @map("schedule_id")
+  employeeId        String    @map("employee_id")
+  employee          Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  startDate         DateTime? @map("start_date")
+  endDate           DateTime? @map("end_date")
+  mondayStartsAt    String?   @map("monday_starts_at")
+  mondayEndsAt      String?   @map("monday_ends_at")
+  tuesdayStartsAt   String?   @map("tuesday_starts_at")
+  tuesdayEndsAt     String?   @map("tuesday_ends_at")
+  wednesdayStartsAt String?   @map("wednesday_starts_at")
+  wednesdayEndsAt   String?   @map("wednesday_ends_at")
+  thursdayStartsAt  String?   @map("thursday_starts_at")
+  thursdayEndsAt    String?   @map("thursday_ends_at")
+  fridayStartsAt    String?   @map("friday_starts_at")
+  fridayEndsAt      String?   @map("friday_ends_at")
+  saturdayStartsAt  String?   @map("saturday_starts_at")
+  saturdayEndsAt    String?   @map("saturday_ends_at")
+  sundayStartsAt    String?   @map("sunday_starts_at")
+  sundayEndsAt      String?   @map("sunday_ends_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("schedules")
+}
+
+model ScheduleExculsion {
+  id         String   @id @default(uuid()) @map("schedule_exclusion_id")
+  employeeId String   @map("employee_id")
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  startDate  DateTime @map("start_date")
+  endDate    DateTime @map("end_date")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("schedule_exclusions")
 }
