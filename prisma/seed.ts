@@ -9,13 +9,14 @@ function daysAgo(days: number): Date {
 }
 
 async function main(): Promise<void> {
-  // Clean existing data
+  // Clean existing data (in correct order to avoid foreign key conflicts)
+  await prisma.employeeService.deleteMany({});
   await prisma.employee.deleteMany({});
   await prisma.service.deleteMany({});
-  console.log('🧹 Cleared employees and services tables');
+  console.log('🧹 Cleared all tables');
 
   // Create employees
-  await prisma.employee.createMany({
+  const employees = await prisma.employee.createMany({
     data: [
       {
         name: 'Alice Johnson',
@@ -31,7 +32,7 @@ async function main(): Promise<void> {
   });
 
   // Create salon services
-  await prisma.service.createMany({
+  const services = await prisma.service.createMany({
     data: [
       {
         title: 'Hair Cut',
@@ -48,7 +49,50 @@ async function main(): Promise<void> {
     ],
   });
 
-  console.log('✅ Seeded 2 employees and 2 salon services');
+  // Get the created records to use their IDs
+  const alice = await prisma.employee.findFirst({
+    where: { name: 'Alice Johnson' },
+  });
+
+  const bob = await prisma.employee.findFirst({
+    where: { name: 'Bob Smith' },
+  });
+
+  const hairCut = await prisma.service.findFirst({
+    where: { title: 'Hair Cut' },
+  });
+
+  const beardTrim = await prisma.service.findFirst({
+    where: { title: 'Beard Trim' },
+  });
+
+  // Create employee-service relationships
+  if (alice && bob && hairCut && beardTrim) {
+    await prisma.employeeService.createMany({
+      data: [
+        // Alice can perform both services
+        {
+          employeeId: alice.id,
+          serviceId: hairCut.id,
+        },
+        {
+          employeeId: alice.id,
+          serviceId: beardTrim.id,
+        },
+        // Bob can only perform hair cut
+        {
+          employeeId: bob.id,
+          serviceId: hairCut.id,
+        },
+      ],
+    });
+  }
+
+  console.log(
+    '✅ Seeded 2 employees, 2 services, and employee-service relationships'
+  );
+  console.log('📋 Alice can perform: Hair Cut, Beard Trim');
+  console.log('📋 Bob can perform: Hair Cut only');
 }
 
 main()
