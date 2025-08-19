@@ -3,13 +3,45 @@
 
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Employee {
+  id                String            @id @default(uuid()) @map("employee_id")
+  name              String            @map("employee_name")
+  profilePictureUrl String?           @map("profile_picture_url")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  EmployeeService   EmployeeService[]
+
+  @@map("employees")
+}
+
+model Service {
+  id              String            @id @default(uuid()) @map("service_id")
+  title           String            @map("service_title")
+  price           Int               @map("service_price")
+  duration        Int               @map("service_duration")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+  EmployeeService EmployeeService[]
+
+  @@map("services")
+}
+
+model EmployeeService {
+  employeeId String   @map("employee_id")
+  serviceId  String   @map("service_id")
+  employee   Employee @relation(fields: [employeeId], references: [id])
+  service    Service  @relation(fields: [serviceId], references: [id])
+
+  @@id([employeeId, serviceId])
+  @@map("employee_services")
 }
