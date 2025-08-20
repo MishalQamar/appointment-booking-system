@@ -1,17 +1,18 @@
-import {
-  Employee,
-  Schedule,
-  ScheduleExculsion,
-  Appointment,
-} from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
-export interface Period {
+export type Period = {
   start: Date;
   end: Date;
-}
-
-export type EmployeeWithRelations = Employee & {
-  schedules: Schedule[];
-  scheduleExclusions: ScheduleExculsion[];
-  appointments: Appointment[];
 };
+
+export type EmployeeWithMetaData = Prisma.EmployeeGetPayload<{
+  include: {
+    schedule: true;
+    scheduleExculsion: true;
+    appointments: true;
+  };
+}>;
+
+// Alias used by some utils (e.g., slots) expecting EmployeeWithRelations
+// Keep in sync with EmployeeWithMetaData to satisfy structural typing
+export type EmployeeWithRelations = EmployeeWithMetaData;

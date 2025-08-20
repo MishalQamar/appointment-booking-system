@@ -1,32 +1,44 @@
-import { 
-  isWithinInterval, 
-  subMinutes, 
+import {
+  isWithinInterval,
+  subMinutes,
   isBefore,
-  isAfter
+  isAfter,
 } from 'date-fns';
-import { EmployeeWithRelations, Service, Period } from './types';
+import { EmployeeWithMetaData, Period } from './types';
 import { generateSlotRange } from './slot-range-generator';
 import { calculateScheduleAvailability } from './schedule-availability';
-import { eachDateInCollection } from './date-collection';
+import {
+  DateCollection,
+  eachDateInCollection,
+} from './date-collection';
 import { addEmployeeToSlot, hasEmployees } from './slot';
+import { Service } from '@prisma/client';
 
 export function calculateServiceSlotAvailability(
-  employees: EmployeeWithRelations[], 
+  employees: EmployeeWithMetaData[],
   service: Service,
-  startsAt: Date, 
+  startsAt: Date,
   endsAt: Date
 ) {
   // Generate all possible slots
   const range = generateSlotRange(startsAt, endsAt, service.duration);
 
   // For each employee, calculate their availability
-  employees.forEach(employee => {
-    const periods = calculateScheduleAvailability(employee, service, startsAt, endsAt);
+  employees.forEach((employee) => {
+    const periods = calculateScheduleAvailability(
+      employee,
+      service,
+      startsAt,
+      endsAt
+    );
 
-    const periodsWithoutAppointments = removeAppointments(periods, employee, service);
+    const periodsWithoutAppointments = removeAppointments(
+      periods,
+      employee
+    );
 
     // Add employee to slots that fall within their available periods
-    periodsWithoutAppointments.forEach(period => {
+    periodsWithoutAppointments.forEach((period) => {
       addAvailableEmployeeForPeriod(range, period, employee);
     });
   });
@@ -35,17 +47,25 @@ export function calculateServiceSlotAvailability(
   return removeEmptySlots(range);
 }
 
-function removeAppointments(periods: Period[], employee: EmployeeWithRelations, service: Service): Period[] {
+function removeAppointments(
+  periods: Period[],
+  employee: EmployeeWithMetaData
+): Period[] {
   let result = [...periods];
 
   // Get non-cancelled appointments
-  const appointments = employee.appointments.filter(app => !app.cancelledAt);
+  const appointments = employee.appointments.filter(
+    (app) => !app.cancelledAt
+  );
 
-  appointments.forEach(appointment => {
-    result = result.flatMap(period => {
+  appointments.forEach((appointment) => {
+    result = result.flatMap((period) => {
       // Fixed 15-minute buffer (more realistic)
       const bufferMinutes = 15;
-      const exclusionStart = subMinutes(appointment.startDate, bufferMinutes);
+      const exclusionStart = subMinutes(
+        appointment.startDate,
+        bufferMinutes
+      );
       const exclusionEnd = appointment.endDate;
 
       // If period doesn't overlap with appointment, keep it
@@ -63,7 +83,7 @@ function removeAppointments(periods: Period[], employee: EmployeeWithRelations, 
       if (isBefore(period.start, exclusionStart)) {
         splitPeriods.push({
           start: period.start,
-          end: exclusionStart
+          end: exclusionStart,
         });
       }
 
@@ -71,7 +91,7 @@ function removeAppointments(periods: Period[], employee: EmployeeWithRelations, 
       if (isAfter(period.end, exclusionEnd)) {
         splitPeriods.push({
           start: exclusionEnd,
-          end: period.end
+          end: period.end,
         });
       }
 
@@ -82,9 +102,13 @@ function removeAppointments(periods: Period[], employee: EmployeeWithRelations, 
   return result;
 }
 
-function addAvailableEmployeeForPeriod(range: any, period: Period, employee: EmployeeWithRelations): void {
-  eachDateInCollection(range, date => {
-    date.slots.forEach(slot => {
+function addAvailableEmployeeForPeriod(
+  range: DateCollection,
+  period: Period,
+  employee: EmployeeWithMetaData
+): void {
+  eachDateInCollection(range, (date) => {
+    date.slots.forEach((slot) => {
       if (isWithinInterval(slot.time, period)) {
         addEmployeeToSlot(slot, employee);
       }
@@ -92,12 +116,12 @@ function addAvailableEmployeeForPeriod(range: any, period: Period, employee: Emp
   });
 }
 
-function removeEmptySlots(range: any): any {
-  range.dates = range.dates.filter((date: any) => {
+function removeEmptySlots(range: DateCollection) {
+  range.dates = range.dates.filter((date) => {
     // Filter out slots with no employees
-    date.slots = date.slots.filter((slot: any) => hasEmployees(slot));
+    date.slots = date.slots.filter((slot) => hasEmployees(slot));
     return date.slots.length > 0; // Keep only dates with available slots
   });
-  
+
   return range;
 }
