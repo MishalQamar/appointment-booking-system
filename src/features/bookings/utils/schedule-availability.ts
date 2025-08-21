@@ -32,7 +32,7 @@ export function calculateScheduleAvailability(
 
   // Subtract schedule exclusions
   employee.scheduleExculsion.forEach((exclusion) => {
-    periods = subtractScheduleExclusion(periods, exclusion, service.duration);
+    periods = subtractScheduleExclusion(periods, exclusion);
   });
 
   // Exclude time that has passed today
@@ -129,8 +129,7 @@ function setTimeFromString(date: Date, timeString: string): Date {
 
 function subtractScheduleExclusion(
   periods: Period[],
-  exclusion: ScheduleExculsion,
-  serviceDurationMinutes: number
+  exclusion: ScheduleExculsion
 ): Period[] {
   return periods.flatMap((period) => {
     // If period doesn't overlap with exclusion, keep it
@@ -142,18 +141,14 @@ function subtractScheduleExclusion(
     }
 
     // Split period around exclusion
-    const result: Period[] = [];
+    const result = [];
 
     // Add part before exclusion
     if (isBefore(period.start, exclusion.startDate)) {
-      // Adjust end so that the latest start remains valid (exclude starts within exclusion)
-      const adjustedEnd = subMinutes(exclusion.startDate, serviceDurationMinutes);
-      if (isAfter(adjustedEnd, period.start) || adjustedEnd.getTime() === period.start.getTime()) {
-        result.push({
-          start: period.start,
-          end: adjustedEnd,
-        });
-      }
+      result.push({
+        start: period.start,
+        end: exclusion.startDate,
+      });
     }
 
     // Add part after exclusion

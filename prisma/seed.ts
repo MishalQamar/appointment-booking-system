@@ -35,13 +35,21 @@ async function main(): Promise<void> {
     data: [
       {
         name: 'Alice Johnson',
-        profilePictureUrl: 'https://example.com/alice.jpg',
+        profilePictureUrl:
+          'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face',
         createdAt: daysAgo(7),
       },
       {
         name: 'Bob Smith',
-        profilePictureUrl: 'https://example.com/bob.jpg',
+        profilePictureUrl:
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
         createdAt: daysAgo(1),
+      },
+      {
+        name: 'Sarah Wilson',
+        profilePictureUrl:
+          'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
+        createdAt: daysAgo(3),
       },
     ],
   });
@@ -61,6 +69,18 @@ async function main(): Promise<void> {
         duration: 15, // 15 minutes
         createdAt: daysAgo(10),
       },
+      {
+        title: 'Hair Coloring',
+        price: 4500, // $45.00
+        duration: 90, // 90 minutes
+        createdAt: daysAgo(10),
+      },
+      {
+        title: 'Hair Styling',
+        price: 3500, // $35.00
+        duration: 45, // 45 minutes
+        createdAt: daysAgo(10),
+      },
     ],
   });
 
@@ -73,6 +93,10 @@ async function main(): Promise<void> {
     where: { name: 'Bob Smith' },
   });
 
+  const sarah = await prisma.employee.findFirst({
+    where: { name: 'Sarah Wilson' },
+  });
+
   const hairCut = await prisma.service.findFirst({
     where: { title: 'Hair Cut' },
   });
@@ -81,11 +105,27 @@ async function main(): Promise<void> {
     where: { title: 'Beard Trim' },
   });
 
+  const hairColoring = await prisma.service.findFirst({
+    where: { title: 'Hair Coloring' },
+  });
+
+  const hairStyling = await prisma.service.findFirst({
+    where: { title: 'Hair Styling' },
+  });
+
   // Create employee-service relationships
-  if (alice && bob && hairCut && beardTrim) {
+  if (
+    alice &&
+    bob &&
+    sarah &&
+    hairCut &&
+    beardTrim &&
+    hairColoring &&
+    hairStyling
+  ) {
     await prisma.employeeService.createMany({
       data: [
-        // Alice can perform both services
+        // Alice can perform all services
         {
           employeeId: alice.id,
           serviceId: hairCut.id,
@@ -94,9 +134,34 @@ async function main(): Promise<void> {
           employeeId: alice.id,
           serviceId: beardTrim.id,
         },
-        // Bob can only perform hair cut
+        {
+          employeeId: alice.id,
+          serviceId: hairColoring.id,
+        },
+        {
+          employeeId: alice.id,
+          serviceId: hairStyling.id,
+        },
+        // Bob can perform hair cut and beard trim
         {
           employeeId: bob.id,
+          serviceId: hairCut.id,
+        },
+        {
+          employeeId: bob.id,
+          serviceId: beardTrim.id,
+        },
+        // Sarah specializes in hair coloring and styling
+        {
+          employeeId: sarah.id,
+          serviceId: hairColoring.id,
+        },
+        {
+          employeeId: sarah.id,
+          serviceId: hairStyling.id,
+        },
+        {
+          employeeId: sarah.id,
           serviceId: hairCut.id,
         },
       ],
@@ -155,6 +220,30 @@ async function main(): Promise<void> {
       },
     });
 
+    // Sarah's schedule - works Tuesday to Saturday, specializes in longer appointments
+    await prisma.schedule.create({
+      data: {
+        employeeId: sarah.id,
+        startDate: currentDate,
+        endDate: addYears(currentDate, 1),
+        // Tuesday to Saturday
+        mondayStartsAt: null,
+        mondayEndsAt: null,
+        tuesdayStartsAt: '09:00',
+        tuesdayEndsAt: '18:00',
+        wednesdayStartsAt: '09:00',
+        wednesdayEndsAt: '18:00',
+        thursdayStartsAt: '09:00',
+        thursdayEndsAt: '18:00',
+        fridayStartsAt: '09:00',
+        fridayEndsAt: '18:00',
+        saturdayStartsAt: '10:00',
+        saturdayEndsAt: '16:00',
+        sundayStartsAt: null,
+        sundayEndsAt: null,
+      },
+    });
+
     // Create schedule exclusions for unavailable months
     await prisma.scheduleExculsion.createMany({
       data: [
@@ -181,12 +270,18 @@ async function main(): Promise<void> {
   }
 
   console.log(
-    '✅ Seeded 2 employees, 2 services, employee-service relationships, schedules, and exclusions'
+    '✅ Seeded 3 employees, 4 services, employee-service relationships, schedules, and exclusions'
   );
-  console.log('📋 Alice can perform: Hair Cut, Beard Trim');
-  console.log('📋 Bob can perform: Hair Cut only');
+  console.log(
+    '📋 Alice can perform: Hair Cut, Beard Trim, Hair Coloring, Hair Styling'
+  );
+  console.log('📋 Bob can perform: Hair Cut, Beard Trim');
+  console.log(
+    '📋 Sarah can perform: Hair Coloring, Hair Styling, Hair Cut'
+  );
   console.log('📅 Alice works: Mon-Sat 9-5 (Sat 10-4), not Sundays');
   console.log('📅 Bob works: Mon-Fri 10-4, not weekends');
+  console.log('📅 Sarah works: Tue-Sat 9-6 (Sat 10-4), not Mon/Sun');
   console.log('🚫 Alice unavailable: July, March 10-20');
   console.log('🚫 Bob unavailable: December 15-31');
 }
