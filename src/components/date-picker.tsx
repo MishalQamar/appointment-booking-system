@@ -1,7 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { format } from 'date-fns';
+import {
+  format,
+  startOfDay,
+  startOfMonth,
+  isBefore,
+  isSameDay,
+} from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -12,10 +18,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { DateWithSlots } from '@/features/bookings/utils/date';
 
-export function DatePicker() {
+type DatePickerProps = {
+  dates: DateWithSlots[];
+};
+
+export function DatePicker({ dates }: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(undefined);
+  const [month, setMonth] = React.useState<Date>(
+    startOfMonth(new Date())
+  );
 
   return (
     <div className="w-full">
@@ -32,7 +46,12 @@ export function DatePicker() {
             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent
+          className="w-auto p-0"
+          align="start"
+          side="bottom"
+          avoidCollisions={false}
+        >
           <Calendar
             mode="single"
             selected={date}
@@ -40,10 +59,23 @@ export function DatePicker() {
               setDate(date);
               setOpen(false);
             }}
-            disabled={(date) =>
-              date > new Date() || date < new Date('1900-01-01')
-            }
-            captionLayout="dropdown"
+            month={month}
+            onMonthChange={(newMonth) => {
+              // Only allow navigation to current month or future months
+              const currentMonth = startOfMonth(new Date());
+              if (newMonth >= currentMonth) {
+                setMonth(newMonth);
+              }
+            }}
+            fromDate={startOfDay(new Date())}
+            disabled={(date) => {
+              const isDateAvailable = dates.some((availableDate) =>
+                isSameDay(availableDate.date, date)
+              );
+
+              return !isDateAvailable; // Disable if date not found
+            }}
+            captionLayout="label"
           />
         </PopoverContent>
       </Popover>

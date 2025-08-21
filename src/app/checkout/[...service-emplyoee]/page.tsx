@@ -1,9 +1,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getEmployee } from '@/features/employee/get-employee';
+import { getEmployee } from '@/features/employee/queries/get-employee';
 import { getService } from '@/features/services/get-service';
 import { DatePicker } from '@/components/date-picker';
+import { calculateServiceSlotAvailability } from '@/features/bookings/utils';
+import { getEmployeesWithMetadata } from '@/features/employee/queries/get-employees-with-metadata';
+import { addMonths, startOfDay } from 'date-fns';
 
 type CheckoutPageProps = {
   params: Promise<{
@@ -16,30 +19,37 @@ export default async function CheckoutPage({
 }: CheckoutPageProps) {
   const { 'service-emplyoee': segments } = await params;
 
-  // Destructure the segments based on URL pattern
   let serviceId: string;
   let employeeId: string | null = null;
 
   if (segments.length === 1) {
-    // Pattern: /checkout/service-id
     serviceId = segments[0];
   } else if (segments.length === 2) {
-    // Pattern: /checkout/service-id/employee-id (actual URL structure)
     [serviceId, employeeId] = segments;
   } else {
-    // Invalid URL pattern
     notFound();
   }
 
   // Fetch data based on what we have
-  const [service, employee] = await Promise.all([
+  const [service, employee, employees] = await Promise.all([
     getService(serviceId),
-    employeeId ? getEmployee(employeeId) : null,
+    employeeId ? getEmployee(employeeId) : Promise.resolve(null),
+    getEmployeesWithMetadata(),
   ]);
 
   if (!service) {
     notFound();
   }
+
+  const availability = calculateServiceSlotAvailability(
+    employees,
+    service,
+    startOfDay(new Date()),
+    addMonths(new Date(), 1)
+  );
+
+  console.log('Full availability:', availability);
+  console.log('Dates from availability:', availability.dates);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -89,7 +99,7 @@ export default async function CheckoutPage({
                       {employee?.name ?? 'Any employee'}
                     </div>
                   </div>
-                  <div className="bg-orange-500 text-white px-3 py-1 rounded-full font-bold text-sm">
+                  <div className="bg-orange-500 text-white px-4 py-2 rounded-full font-bold text-sm">
                     £{(service.price / 100).toFixed(2)}
                   </div>
                 </div>
@@ -101,7 +111,7 @@ export default async function CheckoutPage({
                 1. When for
               </h2>
               <div className="bg-white border border-gray-200 rounded-lg  shadow-sm">
-                <DatePicker />
+                <DatePicker dates={availability.dates} />
               </div>
             </div>
 
@@ -115,13 +125,13 @@ export default async function CheckoutPage({
                     AVAILABLE SLOT
                   </div>
                   <div className="grid grid-cols-3 gap-2">
-                    <button className="bg-orange-500 text-white px-3 py-2 rounded-full text-xs font-medium hover:bg-orange-600 transition-colors">
+                    <button className="bg-orange-500 text-white px-4 py-2 rounded-full text-xs font-medium hover:bg-orange-600 transition-colors">
                       11:30 AM
                     </button>
-                    <button className="bg-white text-black border border-gray-200 px-3 py-2 rounded-full text-xs font-medium hover:bg-gray-50 transition-colors">
+                    <button className="bg-white text-black border border-gray-200 px-4 py-2 rounded-full text-xs font-medium hover:bg-gray-50 transition-colors">
                       12:00 PM
                     </button>
-                    <button className="bg-white text-black border border-gray-200 px-3 py-2 rounded-full text-xs font-medium hover:bg-gray-50 transition-colors">
+                    <button className="bg-white text-black border border-gray-200 px-4 py-2 rounded-full text-xs font-medium hover:bg-gray-50 transition-colors">
                       2:30 PM
                     </button>
                   </div>
