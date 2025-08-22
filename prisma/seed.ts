@@ -20,6 +20,39 @@ function addMonths(date: Date, months: number): Date {
   return newDate;
 }
 
+// Helper function to calculate end time based on start time and duration in minutes
+function calculateEndTime(
+  startTime: Date,
+  durationMinutes: number
+): Date {
+  const endTime = new Date(startTime);
+  endTime.setMinutes(endTime.getMinutes() + durationMinutes);
+  return endTime;
+}
+
+// Helper function to create appointment with proper slot times
+function createAppointment(
+  employeeId: string,
+  serviceId: string,
+  startTime: Date,
+  durationMinutes: number,
+  name: string,
+  email: string,
+  cancelledAt?: Date
+) {
+  const endTime = calculateEndTime(startTime, durationMinutes);
+  return {
+    employeeId,
+    serviceId,
+    startsAt: startTime,
+    endsAt: endTime,
+    date: startTime, // Add the date field
+    name,
+    email,
+    ...(cancelledAt && { cancelledAt }),
+  };
+}
+
 async function main(): Promise<void> {
   // Clean existing data (in correct order to avoid foreign key conflicts)
   await prisma.appointment.deleteMany({});
@@ -44,12 +77,6 @@ async function main(): Promise<void> {
         profilePictureUrl:
           'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
         createdAt: daysAgo(1),
-      },
-      {
-        name: 'Sarah Wilson',
-        profilePictureUrl:
-          'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
-        createdAt: daysAgo(3),
       },
     ],
   });
@@ -93,10 +120,6 @@ async function main(): Promise<void> {
     where: { name: 'Bob Smith' },
   });
 
-  const sarah = await prisma.employee.findFirst({
-    where: { name: 'Sarah Wilson' },
-  });
-
   const hairCut = await prisma.service.findFirst({
     where: { title: 'Hair Cut' },
   });
@@ -117,7 +140,6 @@ async function main(): Promise<void> {
   if (
     alice &&
     bob &&
-    sarah &&
     hairCut &&
     beardTrim &&
     hairColoring &&
@@ -125,7 +147,7 @@ async function main(): Promise<void> {
   ) {
     await prisma.employeeService.createMany({
       data: [
-        // Alice can perform all services
+        // Alice can perform all services (including Sarah's specialties)
         {
           employeeId: alice.id,
           serviceId: hairCut.id,
@@ -150,19 +172,6 @@ async function main(): Promise<void> {
         {
           employeeId: bob.id,
           serviceId: beardTrim.id,
-        },
-        // Sarah specializes in hair coloring and styling
-        {
-          employeeId: sarah.id,
-          serviceId: hairColoring.id,
-        },
-        {
-          employeeId: sarah.id,
-          serviceId: hairStyling.id,
-        },
-        {
-          employeeId: sarah.id,
-          serviceId: hairCut.id,
         },
       ],
     });
@@ -220,30 +229,6 @@ async function main(): Promise<void> {
       },
     });
 
-    // Sarah's schedule - works Tuesday to Saturday, specializes in longer appointments
-    await prisma.schedule.create({
-      data: {
-        employeeId: sarah.id,
-        startDate: currentDate,
-        endDate: addYears(currentDate, 1),
-        // Tuesday to Saturday
-        mondayStartsAt: null,
-        mondayEndsAt: null,
-        tuesdayStartsAt: '09:00',
-        tuesdayEndsAt: '18:00',
-        wednesdayStartsAt: '09:00',
-        wednesdayEndsAt: '18:00',
-        thursdayStartsAt: '09:00',
-        thursdayEndsAt: '18:00',
-        fridayStartsAt: '09:00',
-        fridayEndsAt: '18:00',
-        saturdayStartsAt: '10:00',
-        saturdayEndsAt: '16:00',
-        sundayStartsAt: null,
-        sundayEndsAt: null,
-      },
-    });
-
     // Create schedule exclusions for unavailable months
     await prisma.scheduleExculsion.createMany({
       data: [
@@ -259,31 +244,323 @@ async function main(): Promise<void> {
           startDate: new Date(currentDate.getFullYear(), 11, 15), // December 15th
           endDate: new Date(currentDate.getFullYear(), 11, 31), // December 31st
         },
-        // Alice also unavailable in March for training
-        {
-          employeeId: alice.id,
-          startDate: new Date(currentDate.getFullYear(), 2, 10), // March 10th
-          endDate: new Date(currentDate.getFullYear(), 2, 20), // March 20th
-        },
       ],
+    });
+
+    // Create appointments for employees with proper slot times
+    const appointments = [
+      // Past appointments (completed)
+      createAppointment(
+        alice.id,
+        hairCut.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() - 2,
+          10,
+          0
+        ), // 2 days ago at 10:00 AM
+        hairCut.duration,
+        'John Smith',
+        'john.smith@email.com'
+      ),
+      createAppointment(
+        bob.id,
+        beardTrim.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() - 1,
+          14,
+          0
+        ), // 1 day ago at 2:00 PM
+        beardTrim.duration,
+        'Mike Johnson',
+        'mike.johnson@email.com'
+      ),
+      createAppointment(
+        alice.id,
+        hairColoring.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() - 3,
+          11,
+          0
+        ), // 3 days ago at 11:00 AM
+        hairColoring.duration,
+        'Emily Davis',
+        'emily.davis@email.com'
+      ),
+
+      // Future appointments (upcoming) - More realistic booking times
+      createAppointment(
+        alice.id,
+        hairStyling.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 1,
+          9,
+          0
+        ), // Tomorrow at 9:00 AM
+        hairStyling.duration,
+        'Lisa Wilson',
+        'lisa.wilson@email.com'
+      ),
+      createAppointment(
+        bob.id,
+        hairCut.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 1,
+          10,
+          0
+        ), // Tomorrow at 10:00 AM
+        hairCut.duration,
+        'David Brown',
+        'david.brown@email.com'
+      ),
+      createAppointment(
+        alice.id,
+        hairStyling.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 1,
+          11,
+          0
+        ), // Tomorrow at 11:00 AM
+        hairStyling.duration,
+        'Jennifer Lee',
+        'jennifer.lee@email.com'
+      ),
+      createAppointment(
+        bob.id,
+        beardTrim.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 1,
+          14,
+          0
+        ), // Tomorrow at 2:00 PM
+        beardTrim.duration,
+        'Chris Garcia',
+        'chris.garcia@email.com'
+      ),
+      createAppointment(
+        alice.id,
+        hairColoring.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 1,
+          15,
+          0
+        ), // Tomorrow at 3:00 PM
+        hairColoring.duration,
+        'Sarah Miller',
+        'sarah.miller@email.com'
+      ),
+
+      // Day after tomorrow appointments
+      createAppointment(
+        alice.id,
+        hairCut.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 2,
+          9,
+          0
+        ), // Day after tomorrow at 9:00 AM
+        hairCut.duration,
+        'Tom Anderson',
+        'tom.anderson@email.com'
+      ),
+      createAppointment(
+        bob.id,
+        hairStyling.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 2,
+          10,
+          0
+        ), // Day after tomorrow at 10:00 AM
+        hairStyling.duration,
+        'Rachel Green',
+        'rachel.green@email.com'
+      ),
+      createAppointment(
+        alice.id,
+        beardTrim.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 2,
+          11,
+          0
+        ), // Day after tomorrow at 11:00 AM
+        beardTrim.duration,
+        'Alex Turner',
+        'alex.turner@email.com'
+      ),
+      createAppointment(
+        bob.id,
+        hairCut.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 2,
+          14,
+          0
+        ), // Day after tomorrow at 2:00 PM
+        hairCut.duration,
+        'Emma Wilson',
+        'emma.wilson@email.com'
+      ),
+
+      // 3 days from now appointments
+      createAppointment(
+        alice.id,
+        hairColoring.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 3,
+          9,
+          0
+        ), // 3 days from now at 9:00 AM
+        hairColoring.duration,
+        'Michael Brown',
+        'michael.brown@email.com'
+      ),
+      createAppointment(
+        bob.id,
+        beardTrim.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 3,
+          10,
+          0
+        ), // 3 days from now at 10:00 AM
+        beardTrim.duration,
+        'Jessica Davis',
+        'jessica.davis@email.com'
+      ),
+      createAppointment(
+        alice.id,
+        hairStyling.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 3,
+          14,
+          0
+        ), // 3 days from now at 2:00 PM
+        hairStyling.duration,
+        'Kevin Johnson',
+        'kevin.johnson@email.com'
+      ),
+
+      // 4 days from now appointments
+      createAppointment(
+        alice.id,
+        hairCut.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 4,
+          9,
+          0
+        ), // 4 days from now at 9:00 AM
+        hairCut.duration,
+        'Amanda Clark',
+        'amanda.clark@email.com'
+      ),
+      createAppointment(
+        bob.id,
+        hairStyling.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 4,
+          11,
+          0
+        ), // 4 days from now at 11:00 AM
+        hairStyling.duration,
+        'Ryan Taylor',
+        'ryan.taylor@email.com'
+      ),
+
+      // Cancelled appointments
+      createAppointment(
+        alice.id,
+        hairCut.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() - 5,
+          9,
+          0
+        ), // 5 days ago at 9:00 AM
+        hairCut.duration,
+        'Robert Taylor',
+        'robert.taylor@email.com',
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() - 6,
+          16,
+          0
+        ) // Cancelled 6 days ago at 4:00 PM
+      ),
+      createAppointment(
+        alice.id,
+        hairColoring.id,
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate() + 1,
+          13,
+          0
+        ), // Tomorrow at 1:00 PM
+        hairColoring.duration,
+        'Amanda Clark',
+        'amanda.clark@email.com',
+        new Date(
+          currentDate.getFullYear(),
+          currentDate.getMonth(),
+          currentDate.getDate(),
+          14,
+          0
+        ) // Cancelled today at 2:00 PM
+      ),
+    ];
+
+    await prisma.appointment.createMany({
+      data: appointments,
     });
   }
 
   console.log(
-    '✅ Seeded 3 employees, 4 services, employee-service relationships, schedules, and exclusions'
+    '✅ Seeded 2 employees, 4 services, employee-service relationships, schedules, exclusions, and 20 appointments'
   );
   console.log(
     '📋 Alice can perform: Hair Cut, Beard Trim, Hair Coloring, Hair Styling'
   );
   console.log('📋 Bob can perform: Hair Cut, Beard Trim');
-  console.log(
-    '📋 Sarah can perform: Hair Coloring, Hair Styling, Hair Cut'
-  );
   console.log('📅 Alice works: Mon-Sat 9-5 (Sat 10-4), not Sundays');
   console.log('📅 Bob works: Mon-Fri 10-4, not weekends');
-  console.log('📅 Sarah works: Tue-Sat 9-6 (Sat 10-4), not Mon/Sun');
-  console.log('🚫 Alice unavailable: July, March 10-20');
+  console.log('🚫 Alice unavailable: July');
   console.log('🚫 Bob unavailable: December 15-31');
+  console.log(
+    '📝 Created 20 appointments: 3 past, 15 future, 2 cancelled'
+  );
 }
 
 main()

@@ -22,14 +22,41 @@ import { DateWithSlots } from '@/features/bookings/utils/date';
 
 type DatePickerProps = {
   dates: DateWithSlots[];
+  setDateWithSlots: React.Dispatch<
+    React.SetStateAction<DateWithSlots>
+  >;
 };
 
-export function DatePicker({ dates }: DatePickerProps) {
+export function DatePicker({
+  dates,
+  setDateWithSlots,
+}: DatePickerProps) {
   const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>(undefined);
-  const [month, setMonth] = React.useState<Date>(
-    startOfMonth(new Date())
+
+  // Find the first available date from the dates prop
+  const firstAvailableDate = React.useMemo(
+    () => (dates && dates.length > 0 ? dates[0].date : new Date()),
+    [dates]
   );
+
+  const [date, setDate] = React.useState<Date>(firstAvailableDate);
+
+  // Set the initial dateWithSlots when component mounts
+  React.useEffect(() => {
+    const initialDateWithSlots = dates.find((d) =>
+      isSameDay(d.date, firstAvailableDate)
+    );
+    if (initialDateWithSlots) {
+      setDateWithSlots(initialDateWithSlots);
+    }
+  }, [dates, firstAvailableDate, setDateWithSlots]);
+
+  const [month, setMonth] = React.useState<Date>(
+    firstAvailableDate
+      ? startOfMonth(firstAvailableDate)
+      : startOfMonth(new Date())
+  );
+  const formattedStringDate = date ? format(date, 'yyyy-MM-dd') : '';
 
   return (
     <div className="w-full">
@@ -42,8 +69,13 @@ export function DatePicker({ dates }: DatePickerProps) {
               !date && 'text-muted-foreground'
             )}
           >
-            {date ? format(date, 'PPP') : <span>Pick a date</span>}
+            {date ? format(date, 'PPP') : <span>Select a date</span>}
             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+            <input
+              type="hidden"
+              name="date"
+              value={formattedStringDate}
+            />
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -55,8 +87,17 @@ export function DatePicker({ dates }: DatePickerProps) {
           <Calendar
             mode="single"
             selected={date}
-            onSelect={(date) => {
-              setDate(date);
+            onSelect={(selectedDate) => {
+              if (selectedDate) {
+                setDate(selectedDate);
+                // Find the corresponding DateWithSlots and update parent state
+                const selectedDateWithSlots = dates.find((d) =>
+                  isSameDay(d.date, selectedDate)
+                );
+                if (selectedDateWithSlots) {
+                  setDateWithSlots(selectedDateWithSlots);
+                }
+              }
               setOpen(false);
             }}
             month={month}
@@ -76,6 +117,7 @@ export function DatePicker({ dates }: DatePickerProps) {
               return !isDateAvailable; // Disable if date not found
             }}
             captionLayout="label"
+            datesWithSlots={dates}
           />
         </PopoverContent>
       </Popover>

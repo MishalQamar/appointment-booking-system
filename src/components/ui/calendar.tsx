@@ -15,6 +15,8 @@ import { startOfMonth, isSameMonth } from 'date-fns';
 
 import { cn } from '@/lib/utils';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { DateWithSlots } from '@/features/bookings/utils/date';
+import pluralize from 'pluralize';
 
 function Calendar({
   className,
@@ -24,9 +26,11 @@ function Calendar({
   buttonVariant = 'ghost',
   formatters,
   components,
+  datesWithSlots,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>['variant'];
+  datesWithSlots?: DateWithSlots[];
 }) {
   // Force captionLayout to always be "label" to remove dropdowns
   const forcedCaptionLayout = 'label';
@@ -36,9 +40,7 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        'bg-background group/calendar px-6 py-3 [--cell-size:--spacing(8)] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent',
-        String.raw`rtl:**:[.rdp-button\_next>svg]:rotate-180`,
-        String.raw`rtl:**:[.rdp-button\_previous>svg]:rotate-180`,
+        'bg-white rounded-lg shadow-sm border border-gray-200 px-4 py-2 [--cell-size:--spacing(12)]',
         className
       )}
       captionLayout={forcedCaptionLayout}
@@ -63,12 +65,12 @@ function Calendar({
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
+          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none text-gray-400',
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
+          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none text-black',
           defaultClassNames.button_next
         ),
         month_caption: cn(
@@ -88,19 +90,16 @@ function Calendar({
           defaultClassNames.dropdown
         ),
         caption_label: cn(
-          'select-none font-medium',
-          captionLayout === 'label'
-            ? 'text-sm'
-            : 'rounded-md pl-2 pr-1 flex items-center gap-1 text-sm h-8 [&>svg]:text-muted-foreground [&>svg]:size-3.5',
+          'select-none font-bold text-black text-lg',
           defaultClassNames.caption_label
         ),
         table: 'w-full border-collapse',
         weekdays: cn('flex', defaultClassNames.weekdays),
         weekday: cn(
-          'text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] select-none',
+          'text-black flex-1 font-normal text-sm select-none',
           defaultClassNames.weekday
         ),
-        week: cn('flex w-full mt-2', defaultClassNames.week),
+        week: cn('flex w-full', defaultClassNames.week),
         week_number_header: cn(
           'select-none w-(--cell-size)',
           defaultClassNames.week_number_header
@@ -110,31 +109,28 @@ function Calendar({
           defaultClassNames.week_number
         ),
         day: cn(
-          'relative w-full h-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none',
+          'relative w-full h-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-none [&:last-child[data-selected=true]_button]:rounded-none group/day aspect-square select-none !rounded-none',
           defaultClassNames.day
         ),
         range_start: cn(
-          'rounded-l-md bg-accent',
+          '!rounded-none',
           defaultClassNames.range_start
         ),
         range_middle: cn(
-          'rounded-none',
+          '!rounded-none',
           defaultClassNames.range_middle
         ),
-        range_end: cn(
-          'rounded-r-md bg-accent',
-          defaultClassNames.range_end
-        ),
+        range_end: cn('!rounded-none', defaultClassNames.range_end),
         today: cn(
-          'bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none',
+          'bg-orange-100 text-black data-[selected=true]:rounded-none !rounded-none',
           defaultClassNames.today
         ),
         outside: cn(
-          'text-muted-foreground aria-selected:text-muted-foreground',
+          'text-gray-400 aria-selected:text-gray-400 !rounded-none',
           defaultClassNames.outside
         ),
         disabled: cn(
-          'text-muted-foreground opacity-50',
+          'text-gray-400 opacity-50 !rounded-none',
           defaultClassNames.disabled
         ),
         hidden: cn('invisible', defaultClassNames.hidden),
@@ -208,7 +204,12 @@ function Calendar({
             </Button>
           );
         },
-        DayButton: CalendarDayButton,
+        DayButton: ({ ...buttonProps }) => (
+          <CalendarDayButton
+            {...buttonProps}
+            datesWithSlots={datesWithSlots}
+          />
+        ),
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>
@@ -229,14 +230,24 @@ function CalendarDayButton({
   className,
   day,
   modifiers,
+  datesWithSlots,
   ...props
-}: React.ComponentProps<typeof DayButton>) {
+}: React.ComponentProps<typeof DayButton> & {
+  datesWithSlots?: DateWithSlots[];
+}) {
   const defaultClassNames = getDefaultClassNames();
 
   const ref = React.useRef<HTMLButtonElement>(null);
   React.useEffect(() => {
     if (modifiers.focused) ref.current?.focus();
   }, [modifiers.focused]);
+
+  // Get the number of slots for this date
+  const slotsCount =
+    datesWithSlots?.find(
+      (dateWithSlots) =>
+        dateWithSlots.date.toDateString() === day.date.toDateString()
+    )?.slots?.length || 0;
 
   return (
     <Button
@@ -254,12 +265,24 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        'data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 dark:hover:text-accent-foreground flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 leading-none font-normal group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-md data-[range-end=true]:rounded-r-md data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-md data-[range-start=true]:rounded-l-md [&>span]:text-xs [&>span]:opacity-70',
+        'data-[selected-single=true]:bg-orange-400 data-[selected-single=true]:text-white data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-orange-400 data-[range-start=true]:text-white data-[range-end=true]:bg-orange-400 data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 hover:bg-orange-100 hover:text-black flex aspect-square size-auto w-full h-full min-w-(--cell-size) min-h-(--cell-size) flex-col gap-1 leading-none font-medium group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-none data-[range-end=true]:rounded-none data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-none data-[range-start=true]:rounded-none [&>span]:text-xs [&>span]:opacity-70 border border-gray-200 hover:border-gray-300 !rounded-none',
         defaultClassNames.day,
         className
       )}
       {...props}
-    />
+    >
+      {/* Date number */}
+      <span>{day.date.getDate()}</span>
+
+      {/* Number of slots below the date - only show for available dates */}
+      {!modifiers.disabled ? (
+        <span className="text-[0.6rem] opacity-60">
+          {slotsCount} {pluralize('slot', slotsCount)}
+        </span>
+      ) : (
+        <span className="text-[0.6rem] opacity-0">&nbsp;</span>
+      )}
+    </Button>
   );
 }
 

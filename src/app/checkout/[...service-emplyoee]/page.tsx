@@ -3,10 +3,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getEmployee } from '@/features/employee/queries/get-employee';
 import { getService } from '@/features/services/get-service';
-import { DatePicker } from '@/components/date-picker';
+
 import { calculateServiceSlotAvailability } from '@/features/bookings/utils';
 import { getEmployeesWithMetadata } from '@/features/employee/queries/get-employees-with-metadata';
 import { addMonths, startOfDay } from 'date-fns';
+import { CheckoutForm } from '@/components/checkout-form';
 
 type CheckoutPageProps = {
   params: Promise<{
@@ -42,14 +43,15 @@ export default async function CheckoutPage({
   }
 
   const availability = calculateServiceSlotAvailability(
-    employees,
+    employee
+      ? employees.filter((e) => e.id === employee.id)
+      : employees,
     service,
     startOfDay(new Date()),
     addMonths(new Date(), 1)
   );
 
-  console.log('Full availability:', availability);
-  console.log('Dates from availability:', availability.dates);
+  console.log(availability.dates);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,124 +69,48 @@ export default async function CheckoutPage({
             </h1>
           </div>
 
-          <form className="space-y-6">
-            <div>
-              <h2 className="text-lg font-semibold text-black mb-3">
-                Here&apos;s what you&apos;re booking
-              </h2>
-              <div className="flex space-x-3 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                {employee ? (
-                  <Image
-                    src={
-                      employee.profilePictureUrl ??
-                      '/default-avatar.png'
-                    }
-                    alt={employee.name}
-                    width={56}
-                    height={56}
-                    className="rounded-lg object-cover"
-                  />
-                ) : (
-                  <div className="rounded-lg size-14 bg-slate-200" />
-                )}
-                <div className="w-full flex justify-between items-center">
-                  <div>
-                    <div className="font-bold text-black text-base">
-                      {service.title}
-                    </div>
-                    <div className="text-gray-600 text-sm">
-                      {service.duration} minutes
-                    </div>
-                    <div className="text-gray-500 text-sm">
-                      {employee?.name ?? 'Any employee'}
-                    </div>
-                  </div>
-                  <div className="bg-orange-500 text-white px-4 py-2 rounded-full font-bold text-sm">
-                    £{(service.price / 100).toFixed(2)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-lg font-semibold text-black mb-3">
-                1. When for
-              </h2>
-              <div className="bg-white border border-gray-200 rounded-lg  shadow-sm">
-                <DatePicker dates={availability.dates} />
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-lg font-semibold text-black mb-3">
-                2. Choose a slot
-              </h2>
-              <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-                <div className="text-center text-gray-600">
-                  <div className="text-base font-medium mb-3">
-                    AVAILABLE SLOT
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <button className="bg-orange-500 text-white px-4 py-2 rounded-full text-xs font-medium hover:bg-orange-600 transition-colors">
-                      11:30 AM
-                    </button>
-                    <button className="bg-white text-black border border-gray-200 px-4 py-2 rounded-full text-xs font-medium hover:bg-gray-50 transition-colors">
-                      12:00 PM
-                    </button>
-                    <button className="bg-white text-black border border-gray-200 px-4 py-2 rounded-full text-xs font-medium hover:bg-gray-50 transition-colors">
-                      2:30 PM
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h2 className="text-lg font-semibold text-black mb-3">
-                3. Your details and book
-              </h2>
-              <div className="space-y-3">
+          <div>
+            <h2 className="text-lg font-semibold text-black mb-3">
+              Here&apos;s what you&apos;re booking
+            </h2>
+            <div className="flex space-x-3 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              {employee ? (
+                <Image
+                  src={
+                    employee.profilePictureUrl ??
+                    '/default-avatar.png'
+                  }
+                  alt={employee.name}
+                  width={56}
+                  height={56}
+                  className="rounded-lg object-cover"
+                />
+              ) : (
+                <div className="rounded-lg size-14 bg-slate-200" />
+              )}
+              <div className="w-full flex justify-between items-center">
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Your name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    className="w-full text-sm bg-white border border-gray-200 rounded-lg px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors"
-                    placeholder="Enter your name"
-                    required
-                  />
+                  <div className="font-bold text-black text-base">
+                    {service.title}
+                  </div>
+                  <div className="text-gray-600 text-sm">
+                    {service.duration} minutes
+                  </div>
+                  <div className="text-gray-500 text-sm">
+                    {employee?.name ?? 'Any employee'}
+                  </div>
                 </div>
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Your email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    className="w-full text-sm bg-white border border-gray-200 rounded-lg px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors"
-                    placeholder="Enter your email"
-                    required
-                  />
+                <div className="bg-orange-500 text-white px-4 py-2 rounded-full font-bold text-sm">
+                  £{(service.price / 100).toFixed(2)}
                 </div>
-                <button
-                  type="submit"
-                  className="w-full py-3 px-6 text-base bg-orange-500 text-white font-bold rounded-lg hover:bg-orange-600 transition-colors shadow-sm"
-                >
-                  BOOK APPOINTMENT
-                </button>
               </div>
             </div>
-          </form>
+          </div>
+          <CheckoutForm
+            dates={availability.dates}
+            employee={employee}
+            service={service}
+          />
         </div>
       </div>
     </div>

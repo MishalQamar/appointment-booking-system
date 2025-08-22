@@ -63,10 +63,10 @@ function removeAppointments(
       // Fixed 15-minute buffer (more realistic)
       const bufferMinutes = 15;
       const exclusionStart = subMinutes(
-        appointment.startDate,
+        appointment.startsAt,
         bufferMinutes
       );
-      const exclusionEnd = appointment.endDate;
+      const exclusionEnd = appointment.endsAt;
 
       // If period doesn't overlap with appointment, keep it
       if (
