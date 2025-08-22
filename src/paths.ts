@@ -12,3 +12,6 @@ export const checkoutPath = (
   }
   return `/checkout/${serviceId}`;
 };
+
+export const appointmentPath = (appointmentId: string) =>
+  `/appointments/${appointmentId}`;

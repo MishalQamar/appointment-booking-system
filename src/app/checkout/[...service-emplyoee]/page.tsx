@@ -51,8 +51,6 @@ export default async function CheckoutPage({
     addMonths(new Date(), 1)
   );
 
-  console.log(availability.dates);
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">

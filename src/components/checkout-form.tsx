@@ -1,12 +1,14 @@
 'use client';
 
+import { createAppointment } from '@/features/appointments/actions/create-appointment';
+import { EMPTY_ACTION_STATE } from '@/features/appointments/utils/to-action-state';
 import { DatePicker } from './date-picker';
 
 import { DateWithSlots } from '@/features/bookings/utils/date';
 import { Employee, Service } from '@prisma/client';
 import { format } from 'date-fns';
 
-import { useState } from 'react';
+import { useActionState, useState } from 'react';
 
 export const CheckoutForm = ({
   dates,
@@ -23,9 +25,14 @@ export const CheckoutForm = ({
   const selectedSlotTime = dateWithSlots.slots.find(
     (slot) => slot.time.toISOString() === selectedSlot
   );
+  const [actionState, action] = useActionState(
+    createAppointment,
+    EMPTY_ACTION_STATE
+  );
+  console.log(actionState);
 
   return (
-    <form>
+    <form action={action}>
       <div className="mt-8">
         <h2 className="text-lg font-semibold text-black mb-3">
           1. When for
