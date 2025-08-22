@@ -81,7 +81,7 @@ async function main(): Promise<void> {
     ],
   });
 
-  // Create salon services
+  // Create New Look salon services
   const services = await prisma.service.createMany({
     data: [
       {

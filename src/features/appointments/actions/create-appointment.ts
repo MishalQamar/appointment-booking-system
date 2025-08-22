@@ -32,7 +32,6 @@ export const createAppointment = async (
 
     const service = await prisma.service.findUnique({
       where: { id: data.serviceId },
-      select: { duration: true },
     });
 
     if (!service) {
@@ -45,6 +44,34 @@ export const createAppointment = async (
     );
     const date = new Date(data.date);
 
+    // Check if the appointment is in the past
+    if (startsAt <= new Date()) {
+      return toActionState(
+        'ERROR',
+        'Cannot book appointments in the past. Please select a future time.'
+      );
+    }
+
+    // Check for appointment collision first
+    const conflictingAppointment = await prisma.appointment.findFirst(
+      {
+        where: {
+          employeeId: data.employeeId,
+          startsAt: { lt: endsAt },
+          endsAt: { gt: startsAt },
+          cancelledAt: null,
+        },
+      }
+    );
+
+    if (conflictingAppointment) {
+      return toActionState(
+        'ERROR',
+        'This time slot is no longer available. Please select a different time.'
+      );
+    }
+
+    // Create the appointment
     appointment = await prisma.appointment.create({
       data: {
         employeeId: data.employeeId,
@@ -56,14 +83,9 @@ export const createAppointment = async (
         endsAt,
       },
     });
-
-    if (!appointment) {
-      return toActionState('ERROR', 'Appointment not created');
-    }
   } catch (error) {
     return fromErrorToActionState(error, formData);
   }
 
-  // redirect happens here, outside of try/catch
   redirect(appointmentPath(appointment.id));
 };
