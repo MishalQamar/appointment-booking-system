@@ -1,4 +1,4 @@
-/* import { Appointment, Employee, Service } from '@prisma/client';
+import { Appointment, Service } from '@prisma/client';
 import {
   Body,
   Container,
@@ -15,12 +15,12 @@ import { format } from 'date-fns';
 
 interface EmailAppointmentConfirmationProps {
   appointment: Appointment;
-  employee: Employee;
   service: Service;
 }
 
 const EmailAppointmentConfirmation = ({
   appointment,
+  service,
 }: EmailAppointmentConfirmationProps) => {
   const durationMinutes = Math.round(
     (appointment.endsAt.getTime() - appointment.startsAt.getTime()) /
@@ -62,7 +62,7 @@ const EmailAppointmentConfirmation = ({
                   Service:
                 </Text>
                 <Text className="text-gray-900 text-base m-0 mb-4 font-medium">
-                  {appointment.service.title}
+                  {service.title}
                 </Text>
 
                 <Text className="text-gray-500 text-sm font-bold m-0 mb-1 uppercase">
@@ -81,17 +81,10 @@ const EmailAppointmentConfirmation = ({
                 </Text>
 
                 <Text className="text-gray-500 text-sm font-bold m-0 mb-1 uppercase">
-                  Stylist:
-                </Text>
-                <Text className="text-gray-900 text-base m-0 mb-4 font-medium">
-                  {appointment.employee.name}
-                </Text>
-
-                <Text className="text-gray-500 text-sm font-bold m-0 mb-1 uppercase">
                   Price:
                 </Text>
                 <Text className="text-gray-900 text-base m-0 mb-4 font-medium">
-                  £{(appointment.service.price / 100).toFixed(2)}
+                  £{(service.price / 100).toFixed(2)}
                 </Text>
               </Section>
 
@@ -125,4 +118,3 @@ const EmailAppointmentConfirmation = ({
 };
 
 export default EmailAppointmentConfirmation;
- */
