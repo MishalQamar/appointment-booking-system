@@ -9,7 +9,7 @@ import {
 import z from 'zod';
 import { appointmentPath } from '@/paths';
 import { redirect } from 'next/navigation';
-import { sendAppointmentConfirmationEmail } from '../emails/send-appointment-confirmation-email';
+import { inngest } from '@/lib/inngest';
 
 const createAppointmentSchema = z.object({
   employeeId: z.string(),
@@ -85,7 +85,10 @@ export const createAppointment = async (
       },
     });
 
-    await sendAppointmentConfirmationEmail(appointment, service);
+    await inngest.send({
+      name: 'app/appointment.appointment-created',
+      data: { appointment, service },
+    });
   } catch (error) {
     return fromErrorToActionState(error, formData);
   }
