@@ -87,24 +87,7 @@ export const createAppointment = async (
 
     await inngest.send({
       name: 'app/appointment.appointment-created',
-      data: {
-        email: appointment.email,
-        name: appointment.name,
-        serviceName: service.title,
-        time: appointment.startsAt.toISOString(),
-        date: appointment.startsAt.toLocaleDateString('en-US', {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        }),
-        duration: Math.round(
-          (appointment.endsAt.getTime() -
-            appointment.startsAt.getTime()) /
-            (1000 * 60)
-        ),
-        price: (service.price / 100).toFixed(2),
-      },
+      data: { appointment, service },
     });
   } catch (error) {
     return fromErrorToActionState(error, formData);

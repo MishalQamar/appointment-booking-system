@@ -121,6 +121,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  button {
+    cursor: pointer;
+  }
 }
 
 /* Custom orange theme for calendar */
