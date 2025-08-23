@@ -5,7 +5,6 @@ import {
   format,
   startOfDay,
   startOfMonth,
-  isBefore,
   isSameDay,
 } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';

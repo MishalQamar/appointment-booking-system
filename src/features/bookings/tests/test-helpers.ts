@@ -88,24 +88,29 @@ export function createEmployeeWithAppointments(
 ): EmployeeWithMetaData {
   const employee = createTestEmployee();
 
-  employee.appointments = appointments.map((appointment, index) => ({
-    id: `appointment-${index}`,
-    employeeId: employee.id,
-    serviceId: appointment.serviceId || 'service-1',
-    startDate: setTime(
+  employee.appointments = appointments.map((appointment, index) => {
+    const startsAt = setTime(
       appointment.date || new Date('2024-01-15'),
       appointment.start
-    ),
-    endDate: setTime(
+    );
+    const endsAt = setTime(
       appointment.date || new Date('2024-01-15'),
       appointment.end
-    ),
-    cancelledAt: null,
-    name: 'Test Customer',
-    email: 'test@example.com',
-    createdAt: new Date('2024-01-01'),
-    updatedAt: new Date('2024-01-01'),
-  }));
+    );
+    return {
+      id: `appointment-${index}`,
+      employeeId: employee.id,
+      serviceId: appointment.serviceId || 'service-1',
+      startsAt,
+      endsAt,
+      date: startsAt,
+      cancelledAt: null,
+      name: 'Test Customer',
+      email: 'test@example.com',
+      createdAt: new Date('2024-01-01'),
+      updatedAt: new Date('2024-01-01'),
+    };
+  });
 
   return employee;
 }

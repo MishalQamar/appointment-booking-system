@@ -11,6 +11,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  experimental: {
+    optimizePackageImports: ['@react-email/components'],
+  },
+  // Disable font optimization to avoid lightningcss issues
+  optimizeFonts: false,
 };
 
 export default nextConfig;
