@@ -149,9 +149,9 @@ export const CheckoutForm = ({
             type="hidden"
             name="employeeId"
             value={
-              employee
-                ? employee.id
-                : selectedSlotTime?.employees[0].id
+              employee?.id ||
+              selectedSlotTime?.employees?.[0]?.id ||
+              ''
             }
           />
           <input type="hidden" name="serviceId" value={service.id} />

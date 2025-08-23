@@ -9,7 +9,7 @@ import {
 import z from 'zod';
 import { appointmentPath } from '@/paths';
 import { redirect } from 'next/navigation';
-import { sendAppointmentConfirmationEmail } from '../emails/send-appointment-confirmation-email';
+import { inngest } from '@/lib/inngest';
 
 const createAppointmentSchema = z.object({
   employeeId: z.string(),
@@ -85,7 +85,27 @@ export const createAppointment = async (
       },
     });
 
-    await sendAppointmentConfirmationEmail(appointment, service);
+    await inngest.send({
+      name: 'app/appointment.appointment-created',
+      data: {
+        email: appointment.email,
+        name: appointment.name,
+        serviceName: service.title,
+        time: appointment.startsAt.toISOString(),
+        date: appointment.startsAt.toLocaleDateString('en-US', {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        }),
+        duration: Math.round(
+          (appointment.endsAt.getTime() -
+            appointment.startsAt.getTime()) /
+            (1000 * 60)
+        ),
+        price: (service.price / 100).toFixed(2),
+      },
+    });
   } catch (error) {
     return fromErrorToActionState(error, formData);
   }

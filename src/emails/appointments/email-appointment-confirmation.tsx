@@ -1,4 +1,3 @@
-import { Appointment, Service } from '@prisma/client';
 import {
   Body,
   Container,
@@ -14,19 +13,20 @@ import {
 import { format } from 'date-fns';
 
 interface EmailAppointmentConfirmationProps {
-  appointment: Appointment;
-  service: Service;
+  appointmentData: {
+    email: string;
+    name: string;
+    serviceName: string;
+    time: string;
+    date: string;
+    duration: number;
+    price: string;
+  };
 }
 
 const EmailAppointmentConfirmation = ({
-  appointment,
-  service,
+  appointmentData,
 }: EmailAppointmentConfirmationProps) => {
-  const durationMinutes = Math.round(
-    (appointment.endsAt.getTime() - appointment.startsAt.getTime()) /
-      (1000 * 60)
-  );
-
   return (
     <Html>
       <Head />
@@ -50,7 +50,7 @@ const EmailAppointmentConfirmation = ({
                 Appointment Confirmed!
               </Heading>
               <Text className="text-gray-700 text-base leading-6 m-0 mb-4">
-                Hi {appointment.name},
+                Hi {appointmentData.name},
               </Text>
               <Text className="text-gray-700 text-base leading-6 m-0 mb-4">
                 Your appointment has been successfully booked. Here
@@ -62,29 +62,29 @@ const EmailAppointmentConfirmation = ({
                   Service:
                 </Text>
                 <Text className="text-gray-900 text-base m-0 mb-4 font-medium">
-                  {service.title}
+                  {appointmentData.serviceName}
                 </Text>
 
                 <Text className="text-gray-500 text-sm font-bold m-0 mb-1 uppercase">
                   Date:
                 </Text>
                 <Text className="text-gray-900 text-base m-0 mb-4 font-medium">
-                  {format(appointment.startsAt, 'EEEE, MMMM d, yyyy')}
+                  {appointmentData.date}
                 </Text>
 
                 <Text className="text-gray-500 text-sm font-bold m-0 mb-1 uppercase">
                   Time:
                 </Text>
                 <Text className="text-gray-900 text-base m-0 mb-4 font-medium">
-                  {format(appointment.startsAt, 'h:mm a')} (
-                  {durationMinutes} minutes)
+                  {format(new Date(appointmentData.time), 'h:mm a')} (
+                  {appointmentData.duration} minutes)
                 </Text>
 
                 <Text className="text-gray-500 text-sm font-bold m-0 mb-1 uppercase">
                   Price:
                 </Text>
                 <Text className="text-gray-900 text-base m-0 mb-4 font-medium">
-                  £{(service.price / 100).toFixed(2)}
+                  £{appointmentData.price}
                 </Text>
               </Section>
 
