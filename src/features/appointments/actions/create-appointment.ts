@@ -87,7 +87,21 @@ export const createAppointment = async (
 
     await inngest.send({
       name: 'app/appointment.appointment-created',
-      data: { appointment, service },
+      data: {
+        appointment: {
+          ...appointment,
+          date: appointment.date.toISOString(),
+          startsAt: appointment.startsAt.toISOString(),
+          endsAt: appointment.endsAt.toISOString(),
+          createdAt: appointment.createdAt.toISOString(),
+          updatedAt: appointment.updatedAt.toISOString(),
+        },
+        service: {
+          ...service,
+          createdAt: service.createdAt.toISOString(),
+          updatedAt: service.updatedAt.toISOString(),
+        },
+      },
     });
   } catch (error) {
     return fromErrorToActionState(error, formData);

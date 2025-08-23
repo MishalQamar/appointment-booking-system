@@ -4,8 +4,20 @@ import { Appointment, Service } from '@prisma/client';
 
 export type AppointmentConfirmationEvent = {
   data: {
-    appointment: Appointment;
-    service: Service;
+    appointment: Omit<
+      Appointment,
+      'date' | 'startsAt' | 'endsAt' | 'createdAt' | 'updatedAt'
+    > & {
+      date: string;
+      startsAt: string;
+      endsAt: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+    service: Omit<Service, 'createdAt' | 'updatedAt'> & {
+      createdAt: string;
+      updatedAt: string;
+    };
   };
 };
 
