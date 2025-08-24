@@ -22,9 +22,8 @@ export default async function EmployeePage({
 
     // Next, we fetch the employee data along with their services using the provided employeeId.
     // The function getEmployeeWithServices returns either an employee object (with services) or null if not found.
-    const employeeWithServices = await getEmployeeWithServices(
-      employeeId
-    );
+    const employeeWithServices =
+      await getEmployeeWithServices(employeeId);
 
     console.log(
       '📋 Employee found:',
@@ -41,14 +40,14 @@ export default async function EmployeePage({
     const { services, ...employee } = employeeWithServices;
 
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-blue-grey-50">
         {/* Header */}
-        <header className="bg-black text-white">
+        <header className="bg-purple-800 text-white">
           <div className="container mx-auto px-4 py-6">
             <div className="flex items-center space-x-4">
               <Link
                 href={homePath()}
-                className="text-white hover:text-gray-300 transition-colors flex items-center"
+                className="text-white hover:text-purple-200 transition-colors flex items-center"
               >
                 ← Back to Home
               </Link>
@@ -63,7 +62,7 @@ export default async function EmployeePage({
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-3xl mx-auto">
             {/* Employee Profile */}
-            <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8 shadow-sm">
+            <div className="bg-white rounded-lg border border-blue-grey-200 p-6 mb-8 shadow-sm">
               <div className="flex items-center space-x-6">
                 <div className="relative">
                   <Image
@@ -72,16 +71,16 @@ export default async function EmployeePage({
                       '/default-avatar.png'
                     }
                     alt={employee.name}
-                    className="rounded-full size-16 object-cover ring-2 ring-gray-100"
+                    className="rounded-full size-16 object-cover ring-2 ring-blue-grey-100"
                     width={64}
                     height={64}
                   />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-black mb-2">
+                  <h2 className="text-xl font-bold text-blue-grey-900 mb-2">
                     {employee.name}
                   </h2>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-blue-grey-600 text-sm">
                     Professional Service Provider
                   </p>
                 </div>
@@ -90,7 +89,7 @@ export default async function EmployeePage({
 
             {/* Services Section */}
             <div>
-              <h3 className="text-lg font-bold text-black mb-4">
+              <h3 className="text-lg font-bold text-blue-grey-900 mb-4">
                 Available Services
               </h3>
 
@@ -106,7 +105,7 @@ export default async function EmployeePage({
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <div className="text-gray-400 mb-4">
+                  <div className="text-blue-grey-400 mb-4">
                     <svg
                       className="w-16 h-16 mx-auto"
                       fill="none"
@@ -121,10 +120,10 @@ export default async function EmployeePage({
                       />
                     </svg>
                   </div>
-                  <h4 className="text-lg font-bold text-black mb-2">
+                  <h4 className="text-lg font-bold text-blue-grey-900 mb-2">
                     No Services Available
                   </h4>
-                  <p className="text-gray-600">
+                  <p className="text-blue-grey-600">
                     This professional doesn&apos;t have any services
                     available at the moment.
                   </p>

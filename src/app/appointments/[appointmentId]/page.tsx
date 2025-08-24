@@ -36,13 +36,13 @@ export default async function ConfirmationPage({
   return (
     <>
       <ScrollRestore />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-gradient-to-br from-blue-grey-50 to-blue-grey-100">
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-xl mx-auto">
             <div className="flex items-center mb-6">
               <Link
                 href="/"
-                className="text-orange-600 hover:text-orange-700 transition-colors mr-4 flex items-center"
+                className="text-purple-600 hover:text-purple-700 transition-colors mr-4 flex items-center"
               >
                 <svg
                   className="w-4 h-4 mr-1"
@@ -59,17 +59,17 @@ export default async function ConfirmationPage({
                 </svg>
                 Back to Home
               </Link>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-blue-grey-900">
                 Booking Confirmed
               </h1>
             </div>
 
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg border border-blue-grey-100 overflow-hidden">
               {/* Success Header */}
-              <div className="bg-gradient-to-r from-orange-50 to-orange-100 px-6 py-6 text-center">
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 px-6 py-6 text-center">
                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <svg
-                    className="w-8 h-8 text-orange-600"
+                    className="w-8 h-8 text-purple-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -82,17 +82,17 @@ export default async function ConfirmationPage({
                     />
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                <h2 className="text-xl font-bold text-blue-grey-900 mb-2">
                   Appointment Confirmed!
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-blue-grey-600">
                   Your booking has been successfully scheduled
                 </p>
               </div>
 
               <div className="p-6 space-y-4">
                 {/* Employee & Service Info */}
-                <div className="flex items-center space-x-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4">
+                <div className="flex items-center space-x-3 bg-gradient-to-r from-blue-grey-50 to-blue-grey-100 rounded-lg p-4">
                   <div className="relative">
                     <Image
                       src={
@@ -119,15 +119,15 @@ export default async function ConfirmationPage({
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900 mb-1">
+                    <h3 className="text-lg font-bold text-blue-grey-900 mb-1">
                       {appointment.service.title}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-2">
+                    <p className="text-blue-grey-600 text-sm mb-2">
                       {durationMinutes} minutes • with{' '}
                       {appointment.employee.name}
                     </p>
                     <div className="flex items-center space-x-2">
-                      <span className="text-2xl font-bold text-orange-600">
+                      <span className="text-2xl font-bold text-purple-600">
                         £
                         {(appointment.service.price / 100).toFixed(2)}
                       </span>
@@ -138,7 +138,7 @@ export default async function ConfirmationPage({
                 {/* Email Confirmation */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-start space-x-3">
-                    <div className="w-6 h-6 bg-orange-400 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="w-6 h-6 bg-purple-400 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                       <svg
                         className="w-3 h-3 text-white"
                         fill="none"
@@ -154,16 +154,16 @@ export default async function ConfirmationPage({
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-medium text-gray-900 mb-1 text-sm">
+                      <h3 className="font-medium text-blue-grey-900 mb-1 text-sm">
                         Confirmation Email Sent
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-blue-grey-600 text-sm">
                         We&apos;ve sent a confirmation email to{' '}
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-blue-grey-900">
                           {appointment.email}
                         </span>
                       </p>
-                      <p className="text-gray-500 text-xs mt-1">
+                      <p className="text-blue-grey-500 text-xs mt-1">
                         Please check your inbox and spam folder
                       </p>
                     </div>
@@ -172,10 +172,10 @@ export default async function ConfirmationPage({
 
                 {/* Appointment Details Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center text-sm">
+                  <div className="bg-blue-grey-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-blue-grey-900 mb-3 flex items-center text-sm">
                       <svg
-                        className="w-4 h-4 mr-2 text-orange-500"
+                        className="w-4 h-4 mr-2 text-purple-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -191,10 +191,10 @@ export default async function ConfirmationPage({
                     </h3>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-blue-grey-600 text-sm">
                           Date
                         </span>
-                        <span className="font-medium text-gray-900 text-sm">
+                        <span className="font-medium text-blue-grey-900 text-sm">
                           {format(
                             appointment.startsAt,
                             'EEEE, MMMM d'
@@ -202,28 +202,28 @@ export default async function ConfirmationPage({
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-blue-grey-600 text-sm">
                           Time
                         </span>
-                        <span className="font-medium text-gray-900 text-sm">
+                        <span className="font-medium text-blue-grey-900 text-sm">
                           {format(appointment.startsAt, 'h:mm a')}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-blue-grey-600 text-sm">
                           Duration
                         </span>
-                        <span className="font-medium text-gray-900 text-sm">
+                        <span className="font-medium text-blue-grey-900 text-sm">
                           {durationMinutes} minutes
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center text-sm">
+                  <div className="bg-blue-grey-50 rounded-lg p-4">
+                    <h3 className="font-semibold text-blue-grey-900 mb-3 flex items-center text-sm">
                       <svg
-                        className="w-4 h-4 mr-2 text-orange-500"
+                        className="w-4 h-4 mr-2 text-purple-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -239,23 +239,23 @@ export default async function ConfirmationPage({
                     </h3>
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-blue-grey-600 text-sm">
                           Name
                         </span>
-                        <span className="font-medium text-gray-900 text-sm">
+                        <span className="font-medium text-blue-grey-900 text-sm">
                           {appointment.name}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-blue-grey-600 text-sm">
                           Email
                         </span>
-                        <span className="font-medium text-gray-900 text-xs">
+                        <span className="font-medium text-blue-grey-900 text-xs">
                           {appointment.email}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 text-sm">
+                        <span className="text-blue-grey-600 text-sm">
                           Booking ID
                         </span>
                         <span className="font-mono text-xs bg-white px-2 py-1 rounded border">
@@ -267,10 +267,10 @@ export default async function ConfirmationPage({
                 </div>
 
                 {/* Next Steps */}
-                <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-4">
-                  <h3 className="font-semibold text-gray-900 mb-3 flex items-center text-sm">
+                <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg p-4">
+                  <h3 className="font-semibold text-blue-grey-900 mb-3 flex items-center text-sm">
                     <svg
-                      className="w-4 h-4 mr-2 text-orange-600"
+                      className="w-4 h-4 mr-2 text-purple-600"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -284,27 +284,27 @@ export default async function ConfirmationPage({
                     </svg>
                     What&apos;s Next?
                   </h3>
-                  <div className="space-y-2 text-gray-700 text-sm">
+                  <div className="space-y-2 text-blue-grey-700 text-sm">
                     <p className="flex items-center">
-                      <span className="w-2 h-2 bg-orange-500 rounded-full mr-3"></span>
+                      <span className="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
                       Please arrive 5 minutes before your appointment
                       time
                     </p>
                     <p className="flex items-center">
-                      <span className="w-2 h-2 bg-orange-500 rounded-full mr-3"></span>
+                      <span className="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
                       Bring any relevant documents or information
                     </p>
                     <p className="flex items-center">
-                      <span className="w-2 h-2 bg-orange-500 rounded-full mr-3"></span>
+                      <span className="w-2 h-2 bg-purple-500 rounded-full mr-3"></span>
                       Contact us if you need to make changes
                     </p>
                   </div>
-                  <div className="mt-3 pt-3 border-t border-orange-200">
-                    <p className="text-xs text-gray-600">
+                  <div className="mt-3 pt-3 border-t border-purple-200">
+                    <p className="text-xs text-blue-grey-600">
                       Questions? Contact us at{' '}
                       <a
                         href="mailto:bookings@newlook.com"
-                        className="text-orange-600 hover:text-orange-700 font-medium"
+                        className="text-purple-600 hover:text-purple-700 font-medium"
                       >
                         bookings@newlook.com
                       </a>

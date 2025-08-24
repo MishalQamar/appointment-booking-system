@@ -1,12 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import {
-  format,
-  startOfDay,
-  startOfMonth,
-  isSameDay,
-} from 'date-fns';
+import { format, isSameDay, startOfMonth, addYears } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -39,6 +34,11 @@ export function DatePicker({
   );
 
   const [date, setDate] = React.useState<Date>(firstAvailableDate);
+  const [month, setMonth] = React.useState<Date>(
+    firstAvailableDate
+      ? startOfMonth(firstAvailableDate)
+      : startOfMonth(new Date())
+  );
 
   // Set the initial dateWithSlots when component mounts
   React.useEffect(() => {
@@ -50,11 +50,6 @@ export function DatePicker({
     }
   }, [dates, firstAvailableDate, setDateWithSlots]);
 
-  const [month, setMonth] = React.useState<Date>(
-    firstAvailableDate
-      ? startOfMonth(firstAvailableDate)
-      : startOfMonth(new Date())
-  );
   const formattedStringDate = date ? format(date, 'yyyy-MM-dd') : '';
 
   return (
@@ -64,7 +59,7 @@ export function DatePicker({
           <Button
             variant="outline"
             className={cn(
-              'w-full pl-3 text-left font-normal border-gray-200 hover:border-orange-500 focus:border-orange-500 h-12',
+              'w-full pl-3 text-left font-normal bg-white border-blue-grey-200 hover:border-purple-500 focus:border-purple-500 hover:bg-white focus:bg-white h-12',
               !date && 'text-muted-foreground'
             )}
           >
@@ -101,19 +96,25 @@ export function DatePicker({
             }}
             month={month}
             onMonthChange={(newMonth) => {
-              // Only allow navigation to current month or future months
+              // Only allow navigation to current month or future months, but not beyond 1 year
               const currentMonth = startOfMonth(new Date());
-              if (newMonth >= currentMonth) {
+              const maxMonth = startOfMonth(addYears(new Date(), 1));
+
+              if (newMonth >= currentMonth && newMonth <= maxMonth) {
                 setMonth(newMonth);
               }
             }}
-            fromDate={startOfDay(new Date())}
+            fromDate={new Date()} // today is the minimum
+            toDate={
+              new Date(
+                new Date().setFullYear(new Date().getFullYear() + 1)
+              )
+            } // max 1 year from now
             disabled={(date) => {
               const isDateAvailable = dates.some((availableDate) =>
                 isSameDay(availableDate.date, date)
               );
-
-              return !isDateAvailable; // Disable if date not found
+              return !isDateAvailable;
             }}
             captionLayout="label"
             datesWithSlots={dates}

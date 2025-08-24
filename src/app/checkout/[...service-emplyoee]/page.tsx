@@ -52,26 +52,26 @@ export default async function CheckoutPage({
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-blue-grey-50">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-lg mx-auto">
           <div className="flex items-center mb-6">
             <Link
               href="/"
-              className="text-orange-600 hover:text-orange-700 transition-colors mr-4"
+              className="text-purple-600 hover:text-purple-700 transition-colors mr-4"
             >
               ← Back
             </Link>
-            <h1 className="text-2xl font-bold text-black">
+            <h1 className="text-2xl font-bold text-blue-grey-900">
               BOOK APPOINTMENT
             </h1>
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold text-black mb-3">
+            <h2 className="text-lg font-semibold text-blue-grey-900 mb-3">
               Here&apos;s what you&apos;re booking
             </h2>
-            <div className="flex space-x-3 bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <div className="flex space-x-3 bg-white border border-blue-grey-200 rounded-lg p-4 shadow-sm">
               {employee ? (
                 <Image
                   src={
@@ -84,21 +84,21 @@ export default async function CheckoutPage({
                   className="rounded-lg object-cover"
                 />
               ) : (
-                <div className="rounded-lg size-14 bg-slate-200" />
+                <div className="rounded-lg size-14 bg-blue-grey-200" />
               )}
               <div className="w-full flex justify-between items-center">
                 <div>
-                  <div className="font-bold text-black text-base">
+                  <div className="font-bold text-blue-grey-900 text-base">
                     {service.title}
                   </div>
-                  <div className="text-gray-600 text-sm">
+                  <div className="text-blue-grey-600 text-sm">
                     {service.duration} minutes
                   </div>
-                  <div className="text-gray-500 text-sm">
+                  <div className="text-blue-grey-500 text-sm">
                     {employee?.name ?? 'Any employee'}
                   </div>
                 </div>
-                <div className="bg-orange-500 text-white px-4 py-2 rounded-full font-bold text-sm">
+                <div className="bg-purple-600 text-white px-4 py-2 rounded-full font-bold text-sm">
                   £{(service.price / 100).toFixed(2)}
                 </div>
               </div>

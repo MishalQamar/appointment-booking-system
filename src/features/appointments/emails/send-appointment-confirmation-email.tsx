@@ -9,18 +9,11 @@ type SerializedAppointment = Omit<
   date: string;
   startsAt: string;
   endsAt: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type SerializedService = Omit<Service, 'createdAt' | 'updatedAt'> & {
-  createdAt: string;
-  updatedAt: string;
 };
 
 export const sendAppointmentConfirmationEmail = async (
   appointment: SerializedAppointment,
-  service: SerializedService
+  service: Service
 ) => {
   // Convert ISO strings back to Date objects for the email template
   const appointmentWithDates: Appointment = {
@@ -28,14 +21,6 @@ export const sendAppointmentConfirmationEmail = async (
     date: new Date(appointment.date),
     startsAt: new Date(appointment.startsAt),
     endsAt: new Date(appointment.endsAt),
-    createdAt: new Date(appointment.createdAt),
-    updatedAt: new Date(appointment.updatedAt),
-  };
-
-  const serviceWithDates: Service = {
-    ...service,
-    createdAt: new Date(service.createdAt),
-    updatedAt: new Date(service.updatedAt),
   };
 
   return await resend.emails.send({
@@ -45,7 +30,7 @@ export const sendAppointmentConfirmationEmail = async (
     react: (
       <EmailAppointmentConfirmation
         appointment={appointmentWithDates}
-        service={serviceWithDates}
+        service={service}
       />
     ),
   });

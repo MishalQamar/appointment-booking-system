@@ -45,7 +45,7 @@ const EmailAppointmentConfirmation = ({
       <Tailwind>
         <Body className="bg-gray-50 font-sans">
           <Container className="bg-white mx-auto py-5 mb-16">
-            <Section className="text-center py-8 bg-orange-500 text-white">
+            <Section className="text-center py-8 bg-purple-600 text-white">
               <Heading
                 className="text-white text-3xl font-bold m-0 mb-2"
                 style={{ fontFamily: 'cursive' }}
@@ -110,7 +110,7 @@ const EmailAppointmentConfirmation = ({
 
               <Section className="text-center my-8">
                 <Button
-                  className="bg-orange-500 rounded-lg text-white text-base font-bold no-underline text-center inline-block py-3 px-6"
+                  className="bg-purple-600 rounded-lg text-white text-base font-bold no-underline text-center inline-block py-3 px-6"
                   href="mailto:bookings@newlook.com"
                 >
                   Contact Us

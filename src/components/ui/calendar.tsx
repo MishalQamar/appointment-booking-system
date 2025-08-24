@@ -11,7 +11,6 @@ import {
   DayPicker,
   getDefaultClassNames,
 } from 'react-day-picker';
-import { startOfMonth, isSameMonth } from 'date-fns';
 
 import { cn } from '@/lib/utils';
 import { Button, buttonVariants } from '@/components/ui/button';
@@ -31,18 +30,15 @@ function Calendar({
   buttonVariant?: React.ComponentProps<typeof Button>['variant'];
   datesWithSlots?: DateWithSlots[];
 }) {
-  // Force captionLayout to always be "label" to remove dropdowns
-  const forcedCaptionLayout = 'label';
   const defaultClassNames = getDefaultClassNames();
 
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        'bg-white rounded-lg shadow-sm border border-gray-200 px-4 py-2 [--cell-size:--spacing(12)]',
+        'bg-white rounded-lg shadow-sm border border-blue-grey-200 px-4 py-2 [--cell-size:--spacing(12)]',
         className
       )}
-      captionLayout={forcedCaptionLayout}
       formatters={{
         formatMonthDropdown: (date) =>
           date.toLocaleString('default', { month: 'short' }),
@@ -64,12 +60,12 @@ function Calendar({
         ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
-          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none text-gray-400',
+          'size-(--cell-size) p-0 select-none text-blue-grey-900',
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
-          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none text-black',
+          'size-(--cell-size) p-0 select-none text-blue-grey-900',
           defaultClassNames.button_next
         ),
         month_caption: cn(
@@ -89,13 +85,13 @@ function Calendar({
           defaultClassNames.dropdown
         ),
         caption_label: cn(
-          'select-none font-bold text-black text-lg',
+          'select-none font-bold text-blue-grey-900 text-lg',
           defaultClassNames.caption_label
         ),
         table: 'w-full border-collapse',
-        weekdays: cn('flex', defaultClassNames.weekdays),
+        weekdays: cn('flex mb-3', defaultClassNames.weekdays),
         weekday: cn(
-          'text-black flex-1 font-normal text-sm select-none',
+          'text-blue-grey-900 flex-1 font-normal text-sm select-none pb-2',
           defaultClassNames.weekday
         ),
         week: cn('flex w-full', defaultClassNames.week),
@@ -121,15 +117,15 @@ function Calendar({
         ),
         range_end: cn('!rounded-none', defaultClassNames.range_end),
         today: cn(
-          'bg-orange-100 text-black data-[selected=true]:rounded-none !rounded-none',
+          'bg-purple-100 text-blue-grey-900 data-[selected=true]:rounded-none !rounded-none',
           defaultClassNames.today
         ),
         outside: cn(
-          'text-gray-400 aria-selected:text-gray-400 !rounded-none',
+          'text-blue-grey-400 aria-selected:text-blue-grey-400 !rounded-none',
           defaultClassNames.outside
         ),
         disabled: cn(
-          'text-gray-400 opacity-50 !rounded-none',
+          'text-blue-grey-400 opacity-50 !rounded-none',
           defaultClassNames.disabled
         ),
         hidden: cn('invisible', defaultClassNames.hidden),
@@ -150,7 +146,7 @@ function Calendar({
           if (orientation === 'left') {
             return (
               <ChevronLeftIcon
-                className={cn('size-4', className)}
+                className={cn('size-6', className)}
                 {...props}
               />
             );
@@ -159,7 +155,7 @@ function Calendar({
           if (orientation === 'right') {
             return (
               <ChevronRightIcon
-                className={cn('size-4', className)}
+                className={cn('size-6', className)}
                 {...props}
               />
             );
@@ -167,42 +163,12 @@ function Calendar({
 
           return (
             <ChevronDownIcon
-              className={cn('size-4', className)}
+              className={cn('size-6', className)}
               {...props}
             />
           );
         },
-        PreviousMonthButton: ({
-          className,
-          ...buttonProps
-        }: React.ComponentProps<typeof Button>) => {
-          // Get the current month from the calendar context
-          const currentDisplayMonth =
-            (buttonProps as { displayMonth?: Date }).displayMonth ||
-            (props as { month?: Date }).month ||
-            new Date();
-          const today = new Date();
 
-          // Disable the button if we're at current month or earlier
-          const isDisabled =
-            isSameMonth(currentDisplayMonth, startOfMonth(today)) ||
-            currentDisplayMonth < startOfMonth(today);
-
-          return (
-            <Button
-              variant={buttonVariant}
-              className={cn(
-                'size-(--cell-size) p-0 select-none',
-                isDisabled && 'opacity-50 cursor-not-allowed',
-                className
-              )}
-              disabled={isDisabled}
-              {...buttonProps}
-            >
-              <ChevronLeftIcon className="size-4" />
-            </Button>
-          );
-        },
         DayButton: ({ ...buttonProps }) => (
           <CalendarDayButton
             {...buttonProps}
@@ -264,7 +230,7 @@ function CalendarDayButton({
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}
       className={cn(
-        'data-[selected-single=true]:bg-orange-400 data-[selected-single=true]:text-white data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-orange-400 data-[range-start=true]:text-white data-[range-end=true]:bg-orange-400 data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 hover:bg-orange-100 hover:text-black flex aspect-square size-auto w-full h-full min-w-(--cell-size) min-h-(--cell-size) flex-col gap-1 leading-none font-medium group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-none data-[range-end=true]:rounded-none data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-none data-[range-start=true]:rounded-none [&>span]:text-xs [&>span]:opacity-70 border border-gray-200 hover:border-gray-300 !rounded-none',
+        'data-[selected-single=true]:bg-purple-600 data-[selected-single=true]:text-white data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground data-[range-start=true]:bg-purple-600 data-[range-start=true]:text-white data-[range-end=true]:bg-purple-600 data-[range-end=true]:text-white group-data-[focused=true]/day:border-ring group-data-[focused=true]/day:ring-ring/50 hover:bg-purple-100 hover:text-blue-grey-900 flex aspect-square size-auto w-full h-full min-w-(--cell-size) min-h-(--cell-size) flex-col gap-1 leading-none font-medium group-data-[focused=true]/day:relative group-data-[focused=true]/day:z-10 group-data-[focused=true]/day:ring-[3px] data-[range-end=true]:rounded-none data-[range-end=true]:rounded-none data-[range-middle=true]:rounded-none data-[range-start=true]:rounded-none data-[range-start=true]:rounded-none [&>span]:text-xs [&>span]:opacity-70 border border-blue-grey-200 hover:border-blue-grey-300 !rounded-none',
         defaultClassNames.day,
         className
       )}
