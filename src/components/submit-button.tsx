@@ -41,18 +41,7 @@ const SubmitButton = ({
           })}
         />
       )}
-      {label}
-      {pending ? null : icon ? (
-        <span
-          className={clsx({
-            'ml-2': !!label,
-          })}
-        >
-          {cloneElement(icon, {
-            className: 'w-4 h-4',
-          } as React.HTMLAttributes<HTMLElement>)}
-        </span>
-      ) : null}
+      {pending ? 'Booking Appointment' : label}
     </Button>
   );
 };

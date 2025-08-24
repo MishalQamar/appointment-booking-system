@@ -1,5 +1,6 @@
 import { resend } from '@/lib/resend';
 import EmailAppointmentConfirmation from '@/emails/appointments/email-appointment-confirmation';
+
 import { Appointment, Service } from '@prisma/client';
 
 type SerializedAppointment = Omit<
@@ -11,9 +12,11 @@ type SerializedAppointment = Omit<
   endsAt: string;
 };
 
+type SerializedService = Omit<Service, 'createdAt' | 'updatedAt'>;
+
 export const sendAppointmentConfirmationEmail = async (
   appointment: SerializedAppointment,
-  service: Service
+  service: SerializedService
 ) => {
   // Convert ISO strings back to Date objects for the email template
   const appointmentWithDates: Appointment = {
@@ -21,6 +24,14 @@ export const sendAppointmentConfirmationEmail = async (
     date: new Date(appointment.date),
     startsAt: new Date(appointment.startsAt),
     endsAt: new Date(appointment.endsAt),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  const serviceWithDates: Service = {
+    ...service,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   return await resend.emails.send({
@@ -30,7 +41,7 @@ export const sendAppointmentConfirmationEmail = async (
     react: (
       <EmailAppointmentConfirmation
         appointment={appointmentWithDates}
-        service={service}
+        service={serviceWithDates}
       />
     ),
   });

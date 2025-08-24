@@ -43,7 +43,7 @@ const EmailAppointmentConfirmation = ({
     <Html>
       <Head />
       <Tailwind>
-        <Body className="bg-gray-50 font-sans">
+        <Body className="bg-blue-grey-50 font-sans">
           <Container className="bg-white mx-auto py-5 mb-16">
             <Section className="text-center py-8 bg-purple-600 text-white">
               <Heading
@@ -61,15 +61,15 @@ const EmailAppointmentConfirmation = ({
               <Heading className="text-gray-900 text-2xl font-bold m-0 mb-4 text-center">
                 Appointment Confirmed!
               </Heading>
-              <Text className="text-gray-700 text-base leading-6 m-0 mb-4">
+              <Text className="text-blue-grey-700 text-base leading-6 m-0 mb-4">
                 Hi {appointment.name},
               </Text>
-              <Text className="text-gray-700 text-base leading-6 m-0 mb-4">
+              <Text className="text-blue-grey-700 text-base leading-6 m-0 mb-4">
                 Your appointment has been successfully booked. Here
                 are the details:
               </Text>
 
-              <Section className="bg-gray-50 p-6 rounded-lg my-6">
+              <Section className="bg-blue-grey-50 p-6 rounded-lg my-6">
                 <Text className="text-gray-500 text-sm font-bold m-0 mb-1 uppercase">
                   Service:
                 </Text>
@@ -100,9 +100,9 @@ const EmailAppointmentConfirmation = ({
                 </Text>
               </Section>
 
-              <Hr className="border-gray-200 my-6" />
+              <Hr className="border-blue-grey-200 my-6" />
 
-              <Text className="text-gray-700 text-base leading-6 m-0 mb-4">
+              <Text className="text-blue-grey-700 text-base leading-6 m-0 mb-4">
                 Please arrive 5 minutes before your appointment time.
                 If you need to make any changes, please contact us as
                 soon as possible.
@@ -117,7 +117,7 @@ const EmailAppointmentConfirmation = ({
                 </Button>
               </Section>
 
-              <Text className="text-gray-500 text-sm text-center m-0 mt-8 italic">
+              <Text className="text-blue-grey-500 text-sm text-center m-0 mt-8 italic">
                 Thank you for choosing NEW LOOK! We look forward to
                 seeing you.
               </Text>

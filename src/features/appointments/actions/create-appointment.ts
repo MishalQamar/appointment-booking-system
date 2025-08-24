@@ -9,6 +9,7 @@ import {
 import z from 'zod';
 import { appointmentPath } from '@/paths';
 import { redirect } from 'next/navigation';
+import { inngest } from '@/lib/inngest';
 
 const createAppointmentSchema = z.object({
   employeeId: z.string(),
@@ -84,16 +85,20 @@ export const createAppointment = async (
       },
     });
 
-    // Send confirmation email directly without Inngest
-    try {
-      const { sendAppointmentConfirmationEmail } = await import(
-        '../emails/send-appointment-confirmation-email'
-      );
-      await sendAppointmentConfirmationEmail(appointment, service);
-    } catch (error) {
-      console.error('Failed to send confirmation email:', error);
-      // Don't fail the appointment creation if email fails
-    }
+    await inngest.send({
+      name: 'app/appointment.appointment-created',
+      data: {
+        appointment: {
+          ...appointment,
+          date: appointment.date.toISOString(),
+          startsAt: appointment.startsAt.toISOString(),
+          endsAt: appointment.endsAt.toISOString(),
+        },
+        service: {
+          ...service,
+        },
+      },
+    });
   } catch (error) {
     return fromErrorToActionState(error, formData);
   }
