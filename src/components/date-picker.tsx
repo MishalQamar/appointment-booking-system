@@ -1,7 +1,13 @@
 'use client';
 
 import * as React from 'react';
-import { format, isSameDay, startOfMonth, addYears } from 'date-fns';
+import {
+  format,
+  isSameDay,
+  startOfMonth,
+  addYears,
+  addMonths,
+} from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -34,11 +40,17 @@ export function DatePicker({
   );
 
   const [date, setDate] = React.useState<Date>(firstAvailableDate);
-  const [month, setMonth] = React.useState<Date>(
-    firstAvailableDate
+  const [month, setMonth] = React.useState<Date>(() => {
+    // Ensure we start with current month or later, never past months
+    const currentMonth = startOfMonth(new Date());
+    const firstAvailableMonth = firstAvailableDate
       ? startOfMonth(firstAvailableDate)
-      : startOfMonth(new Date())
-  );
+      : currentMonth;
+
+    return firstAvailableMonth >= currentMonth
+      ? firstAvailableMonth
+      : currentMonth;
+  });
 
   // Set the initial dateWithSlots when component mounts
   React.useEffect(() => {
@@ -96,20 +108,15 @@ export function DatePicker({
             }}
             month={month}
             onMonthChange={(newMonth) => {
-              // Only allow navigation to current month or future months, but not beyond 1 year
+              // Only allow navigation to current month or future months, but not beyond 3 months
               const currentMonth = startOfMonth(new Date());
-              const maxMonth = startOfMonth(addYears(new Date(), 1));
+              const maxMonth = startOfMonth(addMonths(new Date(), 2));
 
+              // Prevent navigation to past months
               if (newMonth >= currentMonth && newMonth <= maxMonth) {
                 setMonth(newMonth);
               }
             }}
-            fromDate={new Date()} // today is the minimum
-            toDate={
-              new Date(
-                new Date().setFullYear(new Date().getFullYear() + 1)
-              )
-            } // max 1 year from now
             disabled={(date) => {
               const isDateAvailable = dates.some((availableDate) =>
                 isSameDay(availableDate.date, date)
@@ -118,6 +125,8 @@ export function DatePicker({
             }}
             captionLayout="label"
             datesWithSlots={dates}
+            currentMonth={month}
+            maxMonth={addMonths(new Date(), 2)}
           />
         </PopoverContent>
       </Popover>

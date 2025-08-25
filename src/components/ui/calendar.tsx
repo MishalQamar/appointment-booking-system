@@ -25,12 +25,47 @@ function Calendar({
   formatters,
   components,
   datesWithSlots,
+  currentMonth,
+  maxMonth,
   ...props
 }: React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>['variant'];
   datesWithSlots?: DateWithSlots[];
+  currentMonth?: Date;
+  maxMonth?: Date;
 }) {
   const defaultClassNames = getDefaultClassNames();
+
+  // Check if chevrons should be disabled
+  const shouldDisableLeftChevron = () => {
+    if (!currentMonth || !maxMonth) return false;
+    const currentMonthStart = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      1
+    );
+    const todayStart = new Date(
+      new Date().getFullYear(),
+      new Date().getMonth(),
+      1
+    );
+    return currentMonthStart <= todayStart;
+  };
+
+  const shouldDisableRightChevron = () => {
+    if (!currentMonth || !maxMonth) return false;
+    const currentMonthStart = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      1
+    );
+    const maxMonthStart = new Date(
+      maxMonth.getFullYear(),
+      maxMonth.getMonth(),
+      1
+    );
+    return currentMonthStart >= maxMonthStart;
+  };
 
   return (
     <DayPicker
@@ -61,11 +96,15 @@ function Calendar({
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
           'size-(--cell-size) p-0 select-none text-blue-grey-900',
+          shouldDisableLeftChevron() &&
+            'pointer-events-none opacity-0',
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: buttonVariant }),
           'size-(--cell-size) p-0 select-none text-blue-grey-900',
+          shouldDisableRightChevron() &&
+            'pointer-events-none opacity-0',
           defaultClassNames.button_next
         ),
         month_caption: cn(
