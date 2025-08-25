@@ -14,10 +14,20 @@ import { inngest } from '@/lib/inngest';
 const createAppointmentSchema = z.object({
   employeeId: z.string(),
   serviceId: z.string(),
-  slot: z.string(),
-  name: z.string(),
-  email: z.string().email(),
-  date: z.string(),
+  slot: z.string().min(1, 'Please select a time slot'),
+  name: z
+    .string()
+    .min(1, 'Please enter your name')
+    .max(191, 'Name is too long (maximum 191 characters)'),
+  email: z
+    .string()
+    .min(1, 'Please enter your email')
+    .email('Please enter a valid email address')
+    .max(191, 'Email is too long (maximum 191 characters)'),
+  date: z
+    .string()
+    .min(1, 'Please select a date')
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Please select a valid date'),
 });
 
 export const createAppointment = async (
