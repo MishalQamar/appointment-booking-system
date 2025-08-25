@@ -8,7 +8,12 @@ export const getEmployeeWithServices = async (employeeId: string) => {
     include: {
       employeeService: {
         include: {
-          service: true,
+          service: {
+            omit: {
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
         },
       },
     },
