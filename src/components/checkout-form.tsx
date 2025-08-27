@@ -92,50 +92,78 @@ export const CheckoutForm = ({
         <h2 className="text-lg font-semibold text-blue-grey-900 mb-3">
           3. Your details and book
         </h2>
-        <div className="space-y-3">
-          <div>
-            <Label
-              htmlFor="name"
-              className="block text-sm font-medium text-blue-grey-700 mb-2"
-            >
-              Your name{' '}
-              <span className="text-red-500" aria-label="required">
-                *
-              </span>
-            </Label>
-            <Input
-              type="text"
-              id="name"
-              name="name"
-              className="w-full text-sm bg-white border rounded-lg px-4 py-3 focus:outline-none transition-colors"
-              placeholder="Enter your name"
-              defaultValue={
-                actionState.payload?.get('name')?.toString() ?? ''
-              }
-            />
-            <FieldError actionState={actionState} name="name" />
-          </div>
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-blue-grey-700 mb-2"
-            >
-              Your email{' '}
-              <span className="text-red-500" aria-label="required">
-                *
-              </span>
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              className="w-full text-sm bg-white border rounded-lg px-4 py-3 focus:outline-none transition-colors"
-              placeholder="Enter your email"
-              defaultValue={
-                actionState.payload?.get('email')?.toString() ?? ''
-              }
-            />
-            <FieldError actionState={actionState} name="email" />
+        <div className="bg-white border border-blue-grey-200 rounded-lg p-6 shadow-sm">
+          <div className="space-y-6">
+            <div>
+              <Label
+                htmlFor="name"
+                className="flex items-center gap-2 text-sm font-medium text-blue-grey-700 mb-2"
+              >
+                <svg
+                  className="w-4 h-4 text-blue-grey-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+                Your name{' '}
+                <span className="text-red-500 font-bold" aria-label="required">
+                  *
+                </span>
+              </Label>
+              <Input
+                type="text"
+                id="name"
+                name="name"
+                className="w-full text-sm bg-white border border-blue-grey-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                placeholder="Enter your name"
+                defaultValue={
+                  actionState.payload?.get('name')?.toString() ?? ''
+                }
+              />
+              <FieldError actionState={actionState} name="name" />
+            </div>
+            <div>
+              <label
+                htmlFor="email"
+                className="flex items-center gap-2 text-sm font-medium text-blue-grey-700 mb-2"
+              >
+                <svg
+                  className="w-4 h-4 text-blue-grey-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
+                </svg>
+                Your email{' '}
+                <span className="text-red-500 font-bold" aria-label="required">
+                  *
+                </span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                className="w-full text-sm bg-white border border-blue-grey-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                placeholder="Enter your email"
+                defaultValue={
+                  actionState.payload?.get('email')?.toString() ?? ''
+                }
+              />
+              <FieldError actionState={actionState} name="email" />
+            </div>
           </div>
 
           <input
@@ -149,11 +177,13 @@ export const CheckoutForm = ({
           />
           <input type="hidden" name="serviceId" value={service.id} />
 
-          <SubmitButton
-            label="BOOK APPOINTMENT"
-            variant="default"
-            size="lg"
-          />
+          <div className="mt-6 pt-6 border-t border-blue-grey-100">
+            <SubmitButton
+              label="BOOK APPOINTMENT"
+              variant="default"
+              size="lg"
+            />
+          </div>
         </div>
       </div>
     </form>
