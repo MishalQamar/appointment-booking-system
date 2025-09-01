@@ -33,6 +33,7 @@ const SubmitButton = ({
       type="submit"
       variant={variant}
       size={size}
+      className="bg-purple-600 text-white hover:bg-purple-700 focus-visible:ring-purple-500 focus-visible:ring-2 focus-visible:ring-offset-2"
     >
       {pending && (
         <LucideLoaderCircle

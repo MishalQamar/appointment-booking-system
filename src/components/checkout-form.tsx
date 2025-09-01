@@ -113,7 +113,10 @@ export const CheckoutForm = ({
                   />
                 </svg>
                 Your name{' '}
-                <span className="text-red-500 font-bold" aria-label="required">
+                <span
+                  className="text-red-500 font-bold"
+                  aria-label="required"
+                >
                   *
                 </span>
               </Label>
@@ -148,7 +151,10 @@ export const CheckoutForm = ({
                   />
                 </svg>
                 Your email{' '}
-                <span className="text-red-500 font-bold" aria-label="required">
+                <span
+                  className="text-red-500 font-bold"
+                  aria-label="required"
+                >
                   *
                 </span>
               </label>
