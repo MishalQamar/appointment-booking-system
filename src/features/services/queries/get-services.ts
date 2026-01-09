@@ -1,6 +1,11 @@
 import prisma from '@/lib/primsa';
 
 export const getServices = async () => {
-  const services = await prisma.service.findMany({});
-  return services;
+  try {
+    const services = await prisma.service.findMany({});
+    return services;
+  } catch (error) {
+    console.error('Error fetching services:', error);
+    return [];
+  }
 };

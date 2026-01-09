@@ -9,8 +9,18 @@ import Link from 'next/link';
 export const dynamic = 'force-dynamic';
 
 export default async function Home() {
-  const employees = await getEmployees();
-  const services = await getServices();
+  let employees: Awaited<ReturnType<typeof getEmployees>> = [];
+  let services: Awaited<ReturnType<typeof getServices>> = [];
+
+  try {
+    [employees, services] = await Promise.all([
+      getEmployees(),
+      getServices(),
+    ]);
+  } catch (error) {
+    console.error('Error loading home page data:', error);
+    // Continue with empty arrays to show the page structure
+  }
 
   return (
     <div className="min-h-screen bg-blue-grey-50">
