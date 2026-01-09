@@ -8,10 +8,15 @@ export const getEmployees = async () => {
         updatedAt: true,
       },
     });
+    console.log('📊 getEmployees result:', employees.length, 'employees');
     if (!employees) return [];
     return employees;
   } catch (error) {
-    console.error('Error fetching employees:', error);
+    console.error('❌ Error fetching employees:', error);
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     return [];
   }
 };

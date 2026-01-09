@@ -11,14 +11,20 @@ export const dynamic = 'force-dynamic';
 export default async function Home() {
   let employees: Awaited<ReturnType<typeof getEmployees>> = [];
   let services: Awaited<ReturnType<typeof getServices>> = [];
+  let hasError = false;
 
   try {
     [employees, services] = await Promise.all([
       getEmployees(),
       getServices(),
     ]);
+    console.log('✅ Loaded data:', { 
+      employeesCount: employees.length, 
+      servicesCount: services.length 
+    });
   } catch (error) {
-    console.error('Error loading home page data:', error);
+    console.error('❌ Error loading home page data:', error);
+    hasError = true;
     // Continue with empty arrays to show the page structure
   }
 
@@ -36,44 +42,67 @@ export default async function Home() {
           <h2 className="text-xl font-bold text-blue-grey-900 mb-4">
             Choose a professional
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {employees.map((employee) => (
-              <Link
-                key={employee.id}
-                href={employeePath(employee.id)}
-                className="bg-white border border-blue-grey-200 rounded-lg p-4 shadow-sm flex flex-col items-center justify-center text-center hover:border-purple-500 hover:shadow-md transition-all duration-200"
-              >
-                <Image
-                  src={
-                    employee.profilePictureUrl ??
-                    '/default-avatar.png'
-                  }
-                  alt={employee.name}
-                  className="rounded-full size-12 object-cover ring-1 ring-blue-grey-100"
-                  width={48}
-                  height={48}
-                />
-                <div className="text-xs font-semibold mt-2 text-blue-grey-900">
-                  {employee.name}
-                </div>
-              </Link>
-            ))}
-          </div>
+          {hasError && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+              <p className="text-yellow-800 text-sm">
+                Unable to load professionals. Please check your database connection.
+              </p>
+            </div>
+          )}
+          {employees.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {employees.map((employee) => (
+                <Link
+                  key={employee.id}
+                  href={employeePath(employee.id)}
+                  className="bg-white border border-blue-grey-200 rounded-lg p-4 shadow-sm flex flex-col items-center justify-center text-center hover:border-purple-500 hover:shadow-md transition-all duration-200"
+                >
+                  <Image
+                    src={
+                      employee.profilePictureUrl ??
+                      '/default-avatar.png'
+                    }
+                    alt={employee.name}
+                    className="rounded-full size-12 object-cover ring-1 ring-blue-grey-100"
+                    width={48}
+                    height={48}
+                  />
+                  <div className="text-xs font-semibold mt-2 text-blue-grey-900">
+                    {employee.name}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white border border-blue-grey-200 rounded-lg p-8 text-center">
+              <p className="text-blue-grey-600">
+                No professionals available at the moment.
+              </p>
+            </div>
+          )}
         </div>
 
         <div>
           <h2 className="text-xl font-bold text-blue-grey-900 mb-4">
             Or, choose a service first
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {services.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-                href={checkoutPath(service.id)}
-              />
-            ))}
-          </div>
+          {services.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {services.map((service) => (
+                <ServiceCard
+                  key={service.id}
+                  service={service}
+                  href={checkoutPath(service.id)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="bg-white border border-blue-grey-200 rounded-lg p-8 text-center">
+              <p className="text-blue-grey-600">
+                No services available at the moment.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
