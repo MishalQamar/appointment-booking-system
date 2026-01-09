@@ -5,6 +5,9 @@ import { checkoutPath, employeePath } from '@/paths';
 import Image from 'next/image';
 import Link from 'next/link';
 
+// Force dynamic rendering to avoid database queries during build time
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const employees = await getEmployees();
   const services = await getServices();
