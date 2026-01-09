@@ -176,15 +176,17 @@ async function main(): Promise<void> {
       ],
     });
 
-    // Create schedules with one-year gaps
-    const currentDate = new Date();
+    // Create schedules for 2026
+    // Use January 1, 2026 as the base date
+    const baseDate2026 = new Date(2026, 0, 1); // January 1, 2026
+    const currentDate = baseDate2026; // Use 2026 as the "current" date for seed data
 
     // Alice's schedule - works most days, but not Sundays
     await prisma.schedule.create({
       data: {
         employeeId: alice.id,
-        startDate: currentDate,
-        endDate: addYears(currentDate, 1),
+        startDate: baseDate2026,
+        endDate: addYears(baseDate2026, 1), // Through December 31, 2026
         // Monday to Saturday - full time
         mondayStartsAt: '09:00',
         mondayEndsAt: '17:00',
@@ -208,8 +210,8 @@ async function main(): Promise<void> {
     await prisma.schedule.create({
       data: {
         employeeId: bob.id,
-        startDate: currentDate,
-        endDate: addYears(currentDate, 1),
+        startDate: baseDate2026,
+        endDate: addYears(baseDate2026, 1), // Through December 31, 2026
         // Monday to Friday only
         mondayStartsAt: '10:00',
         mondayEndsAt: '16:00',
@@ -229,37 +231,32 @@ async function main(): Promise<void> {
       },
     });
 
-    // Create schedule exclusions for unavailable months
+    // Create schedule exclusions for unavailable months in 2026
     await prisma.scheduleExculsion.createMany({
       data: [
-        // Alice takes vacation in July
+        // Alice takes vacation in July 2026
         {
           employeeId: alice.id,
-          startDate: new Date(currentDate.getFullYear(), 6, 1), // July 1st
-          endDate: new Date(currentDate.getFullYear(), 6, 31), // July 31st
+          startDate: new Date(2026, 6, 1), // July 1st, 2026
+          endDate: new Date(2026, 6, 31), // July 31st, 2026
         },
-        // Bob takes vacation in December
+        // Bob takes vacation in December 2026
         {
           employeeId: bob.id,
-          startDate: new Date(currentDate.getFullYear(), 11, 15), // December 15th
-          endDate: new Date(currentDate.getFullYear(), 11, 31), // December 31st
+          startDate: new Date(2026, 11, 15), // December 15th, 2026
+          endDate: new Date(2026, 11, 31), // December 31st, 2026
         },
       ],
     });
 
-    // Create appointments for employees with proper slot times
+    // Create appointments for employees with proper slot times in 2026
+    // Using January 1, 2026 as the base date
     const appointments = [
-      // Past appointments (completed)
+      // Past appointments (completed) - December 2025 (relative to Jan 1, 2026)
       createAppointment(
         alice.id,
         hairCut.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() - 2,
-          10,
-          0
-        ), // 2 days ago at 10:00 AM
+        new Date(2025, 11, 30, 10, 0), // December 30, 2025 at 10:00 AM
         hairCut.duration,
         'John Smith',
         'john.smith@email.com'
@@ -267,13 +264,7 @@ async function main(): Promise<void> {
       createAppointment(
         bob.id,
         beardTrim.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() - 1,
-          14,
-          0
-        ), // 1 day ago at 2:00 PM
+        new Date(2025, 11, 31, 14, 0), // December 31, 2025 at 2:00 PM
         beardTrim.duration,
         'Mike Johnson',
         'mike.johnson@email.com'
@@ -281,29 +272,17 @@ async function main(): Promise<void> {
       createAppointment(
         alice.id,
         hairColoring.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() - 3,
-          11,
-          0
-        ), // 3 days ago at 11:00 AM
+        new Date(2025, 11, 29, 11, 0), // December 29, 2025 at 11:00 AM
         hairColoring.duration,
         'Emily Davis',
         'emily.davis@email.com'
       ),
 
-      // Future appointments (upcoming) - More realistic booking times
+      // Future appointments (upcoming) in January 2026 - More realistic booking times
       createAppointment(
         alice.id,
         hairStyling.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 1,
-          9,
-          0
-        ), // Tomorrow at 9:00 AM
+        new Date(2026, 0, 2, 9, 0), // January 2, 2026 at 9:00 AM
         hairStyling.duration,
         'Lisa Wilson',
         'lisa.wilson@email.com'
@@ -311,13 +290,7 @@ async function main(): Promise<void> {
       createAppointment(
         bob.id,
         hairCut.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 1,
-          10,
-          0
-        ), // Tomorrow at 10:00 AM
+        new Date(2026, 0, 2, 10, 0), // January 2, 2026 at 10:00 AM
         hairCut.duration,
         'David Brown',
         'david.brown@email.com'
@@ -325,13 +298,7 @@ async function main(): Promise<void> {
       createAppointment(
         alice.id,
         hairStyling.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 1,
-          11,
-          0
-        ), // Tomorrow at 11:00 AM
+        new Date(2026, 0, 2, 11, 0), // January 2, 2026 at 11:00 AM
         hairStyling.duration,
         'Jennifer Lee',
         'jennifer.lee@email.com'
@@ -339,13 +306,7 @@ async function main(): Promise<void> {
       createAppointment(
         bob.id,
         beardTrim.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 1,
-          14,
-          0
-        ), // Tomorrow at 2:00 PM
+        new Date(2026, 0, 2, 14, 0), // January 2, 2026 at 2:00 PM
         beardTrim.duration,
         'Chris Garcia',
         'chris.garcia@email.com'
@@ -353,29 +314,17 @@ async function main(): Promise<void> {
       createAppointment(
         alice.id,
         hairColoring.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 1,
-          15,
-          0
-        ), // Tomorrow at 3:00 PM
+        new Date(2026, 0, 2, 15, 0), // January 2, 2026 at 3:00 PM
         hairColoring.duration,
         'Sarah Miller',
         'sarah.miller@email.com'
       ),
 
-      // Day after tomorrow appointments
+      // January 3, 2026 appointments
       createAppointment(
         alice.id,
         hairCut.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 2,
-          9,
-          0
-        ), // Day after tomorrow at 9:00 AM
+        new Date(2026, 0, 3, 9, 0), // January 3, 2026 at 9:00 AM
         hairCut.duration,
         'Tom Anderson',
         'tom.anderson@email.com'
@@ -383,13 +332,7 @@ async function main(): Promise<void> {
       createAppointment(
         bob.id,
         hairStyling.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 2,
-          10,
-          0
-        ), // Day after tomorrow at 10:00 AM
+        new Date(2026, 0, 3, 10, 0), // January 3, 2026 at 10:00 AM
         hairStyling.duration,
         'Rachel Green',
         'rachel.green@email.com'
@@ -397,13 +340,7 @@ async function main(): Promise<void> {
       createAppointment(
         alice.id,
         beardTrim.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 2,
-          11,
-          0
-        ), // Day after tomorrow at 11:00 AM
+        new Date(2026, 0, 3, 11, 0), // January 3, 2026 at 11:00 AM
         beardTrim.duration,
         'Alex Turner',
         'alex.turner@email.com'
@@ -411,29 +348,17 @@ async function main(): Promise<void> {
       createAppointment(
         bob.id,
         hairCut.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 2,
-          14,
-          0
-        ), // Day after tomorrow at 2:00 PM
+        new Date(2026, 0, 3, 14, 0), // January 3, 2026 at 2:00 PM
         hairCut.duration,
         'Emma Wilson',
         'emma.wilson@email.com'
       ),
 
-      // 3 days from now appointments
+      // January 4, 2026 appointments
       createAppointment(
         alice.id,
         hairColoring.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 3,
-          9,
-          0
-        ), // 3 days from now at 9:00 AM
+        new Date(2026, 0, 4, 9, 0), // January 4, 2026 at 9:00 AM
         hairColoring.duration,
         'Michael Brown',
         'michael.brown@email.com'
@@ -441,13 +366,7 @@ async function main(): Promise<void> {
       createAppointment(
         bob.id,
         beardTrim.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 3,
-          10,
-          0
-        ), // 3 days from now at 10:00 AM
+        new Date(2026, 0, 4, 10, 0), // January 4, 2026 at 10:00 AM
         beardTrim.duration,
         'Jessica Davis',
         'jessica.davis@email.com'
@@ -455,29 +374,17 @@ async function main(): Promise<void> {
       createAppointment(
         alice.id,
         hairStyling.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 3,
-          14,
-          0
-        ), // 3 days from now at 2:00 PM
+        new Date(2026, 0, 4, 14, 0), // January 4, 2026 at 2:00 PM
         hairStyling.duration,
         'Kevin Johnson',
         'kevin.johnson@email.com'
       ),
 
-      // 4 days from now appointments
+      // January 5, 2026 appointments
       createAppointment(
         alice.id,
         hairCut.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 4,
-          9,
-          0
-        ), // 4 days from now at 9:00 AM
+        new Date(2026, 0, 5, 9, 0), // January 5, 2026 at 9:00 AM
         hairCut.duration,
         'Amanda Clark',
         'amanda.clark@email.com'
@@ -485,13 +392,7 @@ async function main(): Promise<void> {
       createAppointment(
         bob.id,
         hairStyling.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 4,
-          11,
-          0
-        ), // 4 days from now at 11:00 AM
+        new Date(2026, 0, 5, 11, 0), // January 5, 2026 at 11:00 AM
         hairStyling.duration,
         'Ryan Taylor',
         'ryan.taylor@email.com'
@@ -501,44 +402,20 @@ async function main(): Promise<void> {
       createAppointment(
         alice.id,
         hairCut.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() - 5,
-          9,
-          0
-        ), // 5 days ago at 9:00 AM
+        new Date(2025, 11, 27, 9, 0), // December 27, 2025 at 9:00 AM
         hairCut.duration,
         'Robert Taylor',
         'robert.taylor@email.com',
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() - 6,
-          16,
-          0
-        ) // Cancelled 6 days ago at 4:00 PM
+        new Date(2025, 11, 26, 16, 0) // Cancelled December 26, 2025 at 4:00 PM
       ),
       createAppointment(
         alice.id,
         hairColoring.id,
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate() + 1,
-          13,
-          0
-        ), // Tomorrow at 1:00 PM
+        new Date(2026, 0, 2, 13, 0), // January 2, 2026 at 1:00 PM
         hairColoring.duration,
         'Amanda Clark',
         'amanda.clark@email.com',
-        new Date(
-          currentDate.getFullYear(),
-          currentDate.getMonth(),
-          currentDate.getDate(),
-          14,
-          0
-        ) // Cancelled today at 2:00 PM
+        new Date(2026, 0, 1, 14, 0) // Cancelled January 1, 2026 at 2:00 PM
       ),
     ];
 
@@ -548,18 +425,18 @@ async function main(): Promise<void> {
   }
 
   console.log(
-    '✅ Seeded 2 employees, 4 services, employee-service relationships, schedules, exclusions, and 20 appointments'
+    '✅ Seeded 2 employees, 4 services, employee-service relationships, schedules, exclusions, and 20 appointments for 2026'
   );
   console.log(
     '📋 Alice can perform: Hair Cut, Beard Trim, Hair Coloring, Hair Styling'
   );
   console.log('📋 Bob can perform: Hair Cut, Beard Trim');
-  console.log('📅 Alice works: Mon-Sat 9-5 (Sat 10-4), not Sundays');
-  console.log('📅 Bob works: Mon-Fri 10-4, not weekends');
-  console.log('🚫 Alice unavailable: July');
-  console.log('🚫 Bob unavailable: December 15-31');
+  console.log('📅 Alice works: Mon-Sat 9-5 (Sat 10-4), not Sundays (2026)');
+  console.log('📅 Bob works: Mon-Fri 10-4, not weekends (2026)');
+  console.log('🚫 Alice unavailable: July 2026');
+  console.log('🚫 Bob unavailable: December 15-31, 2026');
   console.log(
-    '📝 Created 20 appointments: 3 past, 15 future, 2 cancelled'
+    '📝 Created 20 appointments: 3 past (Dec 2025), 15 future (Jan 2026), 2 cancelled'
   );
 }
 
